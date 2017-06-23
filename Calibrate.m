@@ -116,7 +116,7 @@ outputPath = 'C:\Users\maoj\Dropbox\UWG_Matlab-master\SensitivityAnalysis\2016da
 %% Run simulation
     UWGGA;
     
-%% Calculate the objective function
+%% Calculate and output the objective function
 
 
 %% GA search
