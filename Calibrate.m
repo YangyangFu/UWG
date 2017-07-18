@@ -3,16 +3,17 @@ function [ UWGCalibrate ] = Calibrate( inputPath, interfacePath, bld2Path, bld3P
 %   Detailed explanation goes here
 
 %% Input and output path
-inputPath = 'C:\Users\maoj\Dropbox\UWG_Matlab-master\SensitivityAnalysis\Inputs.xlsx';
-interfacePath = 'C:\Users\maoj\Dropbox\UWG_Matlab-master\data\RunUWG_AD_GA.xlsm';
-bld2Path = 'C:\Users\maoj\Dropbox\UWG_Matlab-master\data\DOERefBuildings\BLD2.xlsx';
-bld3Path = 'C:\Users\maoj\Dropbox\UWG_Matlab-master\data\DOERefBuildings\BLD3.xlsx';
-bld4Path = 'C:\Users\maoj\Dropbox\UWG_Matlab-master\data\DOERefBuildings\BLD4.xlsx';
-bld6Path = 'C:\Users\maoj\Dropbox\UWG_Matlab-master\data\DOERefBuildings\BLD6.xlsx';
-bld10Path = 'C:\Users\maoj\Dropbox\UWG_Matlab-master\data\DOERefBuildings\BLD10.xlsx';
-bld14Path = 'C:\Users\maoj\Dropbox\UWG_Matlab-master\data\DOERefBuildings\BLD14.xlsx';
-resultPath = 'C:\Users\maoj\Dropbox\UWG_Matlab-master\output\UWGoutput.xlsx';
-outputPath = 'C:\Users\maoj\Dropbox\UWG_Matlab-master\SensitivityAnalysis\2016data\OutputsDec.xlsx';
+currentPath=pwd;
+inputPath = strcat(currentPath,'\SensitivityAnalysis\Inputs.xlsx');
+interfacePath = strcat(currentPath,'\data\RunUWG_AD_GA.xlsm');
+bld2Path = strcat(currentPath,'\data\DOERefBuildings\BLD2.xlsx');
+bld3Path = strcat(currentPath,'\data\DOERefBuildings\BLD3.xlsx');
+bld4Path = strcat(currentPath,'\data\DOERefBuildings\BLD4.xlsx');
+bld6Path = strcat(currentPath,'\data\DOERefBuildings\BLD6.xlsx');
+bld10Path = strcat(currentPath,'\data\DOERefBuildings\BLD10.xlsx');
+bld14Path = strcat(currentPath,'\data\DOERefBuildings\BLD14.xlsx');
+resultPath = strcat(currentPath,'\output\UWGoutput.xlsx');
+outputPath = strcat(currentPath,'\SensitivityAnalysis\2016data\OutputsDec.xlsx');
 
 %% Update model inputs
     % Update meteorological factor
