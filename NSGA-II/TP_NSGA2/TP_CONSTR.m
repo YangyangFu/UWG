@@ -41,7 +41,7 @@ options.sortingfun={'nds',0.2};
 
 options.vartype=[1,2];
 options.useParallel='no';
-options.poolsize=2;
+options.poolsize=20;
 options.initpop=[0.5 4;0.22,2];%[0.5 4;0.4 4];
 
 
