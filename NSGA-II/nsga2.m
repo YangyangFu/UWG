@@ -219,7 +219,8 @@ opt = callOutputfuns(opt, state, pop, -1);
 
 % close worker processes
 if( strcmpi(opt.useParallel, 'yes'))
-    matlabpool close
+    %parpool close
+    delete(gcp('nocreate'))
 end
 
 toc(tStart);
