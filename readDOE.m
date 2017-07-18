@@ -49,8 +49,11 @@ refDOE (16,3,16) = Building;
 Schedule (16,3,16) = SchDef;
 refBEM (16,3,16) = BEMDef;
 
+% current path
+currentPath=pwd;
+
 for i = 1:16
-    file = strcat('C:\Users\maoj\Dropbox\UWG_Matlab-master\data\DOERefBuildings\BLD',num2str(i),'.xlsx');
+    file = strcat(currentPath,'\data\DOERefBuildings\BLD',num2str(i),'.xlsx');
 
     % Read building summary (Sheet 1)
     [num, ~, ~] = xlsread(file,1);

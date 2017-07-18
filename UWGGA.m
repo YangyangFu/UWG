@@ -1,4 +1,4 @@
-function [new_climate_file] = UWGGA(CL_EPW_PATH,CL_EPW,CL_XML_PATH,CL_XML,CL_RE_PATH,CL_RE)
+function [new_climate_file,gaTPredict] = UWGGA(CL_EPW_PATH,CL_EPW,CL_XML_PATH,CL_XML,CL_RE_PATH,CL_RE)
     % =========================================================================
     %  THE URBAN WEATHER GENERATOR
     % =========================================================================
@@ -21,6 +21,8 @@ function [new_climate_file] = UWGGA(CL_EPW_PATH,CL_EPW,CL_XML_PATH,CL_XML,CL_RE_
     %   - compatibility with xml re-established
     %   - read in 'initialize.m' file for Matlab 
     
+    currentPath=pwd;
+ 
     % =========================================================================
     % Section 1 - Definitions for constants / other parameters
     % =========================================================================
@@ -61,7 +63,7 @@ function [new_climate_file] = UWGGA(CL_EPW_PATH,CL_EPW,CL_XML_PATH,CL_XML,CL_RE_
     catch
         % [epwFileName,epwPathName] = uigetfile('.epw','Select Rural EnergyPlus Weather File');
         epwFileName = 'MasdarWeather2016_EPW.epw';
-        epwPathName = 'C:\Users\maoj\Dropbox\UWG_Matlab-master\data\AbuDhabi\weather2016\';
+        epwPathName = strcat(currentPath,'\data\AbuDhabi\weather2016\');
         climate_data = strcat(epwPathName,epwFileName);
     end
 
@@ -118,7 +120,7 @@ function [new_climate_file] = UWGGA(CL_EPW_PATH,CL_EPW,CL_XML_PATH,CL_XML,CL_RE_
     catch
         % [newFileName_withExt,newPathName] = uiputfile('.epw','Select save location');
         newFileName_withExt = 'MasdarWeather2016_EPW_UWG.epw';
-        newPathName = 'C:\Users\maoj\Dropbox\UWG_Matlab-master\output\';
+        newPathName = strcat(currentPath,'\output\');
         new_climate_file = strcat(newPathName,newFileName_withExt);
         newPathName = newPathName(1:end-1);
     end
@@ -135,7 +137,7 @@ function [new_climate_file] = UWGGA(CL_EPW_PATH,CL_EPW,CL_XML_PATH,CL_XML,CL_RE_
     catch
         % [FileName,PathName] = uigetfile('*.xml;*.m;*.xlsm','Select Urban Parameter Input file');
         FileName = 'RunUWG_AD_GA.xlsm';
-        PathName = 'C:\Users\maoj\Dropbox\UWG_Matlab-master\data\';
+        PathName = strcat(currentPath,'\data\');
         xml_location = strcat(PathName,FileName);
     end
     
