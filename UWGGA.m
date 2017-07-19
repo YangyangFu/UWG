@@ -63,7 +63,7 @@ function [new_climate_file,gaTPredict] = UWGGA(CL_EPW_PATH,CL_EPW,CL_XML_PATH,CL
     catch
         % [epwFileName,epwPathName] = uigetfile('.epw','Select Rural EnergyPlus Weather File');
         epwFileName = 'MasdarWeather2016_EPW.epw';
-        epwPathName = strcat(currentPath,'\data\AbuDhabi\weather2016\');
+        epwPathName = strcat(currentPath,'/data/AbuDhabi/weather2016/');
         climate_data = strcat(epwPathName,epwFileName);
     end
 
@@ -137,12 +137,12 @@ function [new_climate_file,gaTPredict] = UWGGA(CL_EPW_PATH,CL_EPW,CL_XML_PATH,CL
     catch
         % [FileName,PathName] = uigetfile('*.xml;*.m;*.xlsm','Select Urban Parameter Input file');
         FileName = 'RunUWG_AD_GA.xlsm';
-        PathName = strcat(currentPath,'\data\');
+        PathName = strcat(currentPath,'/data/');
         xml_location = strcat(PathName,FileName);
     end
     
     % Input files for UWG - note that soil layer buffering and 
-    % layer thickness control are only performed for XML. (should update) 
+    % layer thickness control are only performed f or XML. (should update) 
     [~,~,ext] = fileparts(xml_location);
     if strcmp(ext,'.xlsm')      % Excel input
         
@@ -720,8 +720,8 @@ function [new_climate_file,gaTPredict] = UWGGA(CL_EPW_PATH,CL_EPW,CL_XML_PATH,CL
     if strcmp('Yes',writeEPW)
         disp('Calculating new Temperature and humidity values')
         for iJ = 1:numel(UCMData)
-            epwinput.values{iJ+simTime.timeInitial-8,7}{1,1} = num2str(UCMData(iJ).canTemp- 273.15,'%0.1f'); % dry bulb temperature [°C]
-            epwinput.values{iJ+simTime.timeInitial-8,8}{1,1} = num2str(UCMData(iJ).Tdp,'%0.1f'); % dew point temperature [°C]
+            epwinput.values{iJ+simTime.timeInitial-8,7}{1,1} = num2str(UCMData(iJ).canTemp- 273.15,'%0.1f'); % dry bulb temperature [?C]
+            epwinput.values{iJ+simTime.timeInitial-8,8}{1,1} = num2str(UCMData(iJ).Tdp,'%0.1f'); % dew point temperature [?C]
             epwinput.values{iJ+simTime.timeInitial-8,9}{1,1} = num2str(UCMData(iJ).canRHum,'%0.0f'); % relative humidity [%]
             epwinput.values{iJ+simTime.timeInitial-8,22}{1,1} = num2str(WeatherData(iJ).wind,'%0.1f'); % wind speed [m/s]
         end

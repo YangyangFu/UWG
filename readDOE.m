@@ -53,7 +53,7 @@ refBEM (16,3,16) = BEMDef;
 currentPath=pwd;
 
 for i = 1:16
-    file = strcat(currentPath,'\data\DOERefBuildings\BLD',num2str(i),'.xlsx');
+    file = strcat(currentPath,'/data/DOERefBuildings/BLD',num2str(i),'.xlsx');
 
     % Read building summary (Sheet 1)
     [num, ~, ~] = xlsread(file,1);
