@@ -3,6 +3,16 @@ function newpop = selectOp(opt, pop)
 % Description: Evolutionary strategy selection operator, use binary 
 % tournament selection, choosing lamda individuals from miu individuals as parents.
 %
+% Selection Algorithm: tournament selection with size 2, and the best
+% individual goes to mating pool
+% 
+% Advanced Research: how to determine the best individual especially with
+% surrogate model. For single-objective minimization problem, the best
+% individual has the smallest objective values; for multi-objective
+% minimization problem, the best individual has best parato front ranking;
+% for opmization problem with surrogate, new ranking or comparing operator
+% should be developed.
+%
 %    Author: Yangyang Fu
 %    Date: 07/03/2017
 %*************************************************************************
