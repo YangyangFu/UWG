@@ -8,6 +8,8 @@ function defaultopt = nsgaopt()
 
 
 defaultopt = struct(...
+    ... % Algorithm
+    'algorithm','rga',...
     ... % Optimization model
     'popsize', 50,...           % population size
     'maxGen', 100,...           % maximum generation

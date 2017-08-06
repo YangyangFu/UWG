@@ -3,7 +3,6 @@ function [opt,out,frontpop]=sorting(opt,combinepop)
 
 sortingfun=opt.sortingfun{1,1};
 
-
 switch sortingfun
     case 'nds'
         % Fast non dominated sort

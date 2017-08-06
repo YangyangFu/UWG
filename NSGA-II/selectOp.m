@@ -32,12 +32,18 @@ for i = 1:2:(2*popsize2)
     p1 = randnum(i);
     p2 = randnum(i+1);
     
-    if(~isempty(opt.refPoints))
+    switch opt.algorithm
+        case 'rnsga2'
         % Preference operator (R-NSGA-II)
-        result = preferenceComp( pop(p1), pop(p2) );
-    else
+            result = preferenceComp( pop(p1), pop(p2) );
+        case 'nsga2'
         % Crowded-comparison operator (NSGA-II)
-        result = crowdingComp( pop(p1), pop(p2) );
+            result = crowdingComp( pop(p1), pop(p2) );
+        case 'rga'
+        % Real coded genetic alforithm for signle objective optimization
+            result = fitnessComp(pop(p1),pop(p2));
+        otherwise
+            error("No such algorithm provided. Please specify the algorithm in opt.algorithm");
     end
     
     if(result == 1)
@@ -49,8 +55,7 @@ for i = 1:2:(2*popsize2)
     j = j + 1;
 end
 newpop = pop( pool );
-
-
+end
 
 function result = crowdingComp( guy1, guy2)
 % Function: result = crowdingComp( guy1, guy2)
@@ -68,7 +73,7 @@ if((guy1.rank < guy2.rank) || ((guy1.rank == guy2.rank) && (guy1.distance > guy2
 else
     result = 0;
 end
-
+end
 
 
 function result = preferenceComp(guy1, guy2)
@@ -87,6 +92,24 @@ if(  (guy1.rank  < guy2.rank) || ...
     result = 1;
 else
     result = 0;
+end
+end
+
+function result = fitnessComp(guy1,guy2)
+% Function: result = fitnessComp(guy1, guy2)
+% Description: Preference operator used in RGA
+% Return: 
+%   1 = guy1 is better than guy2
+%   0 = other cases
+%
+%   Author: Yangyang Fu
+%   First Implementation: Aug 04, 2017
+%*************************************************************************
+if (guy1.fitness <= guy2.fitness)    
+    result = 1;
+else
+    result = 0;
+end
 end
 
 

@@ -14,6 +14,8 @@ switch sortingfun
 
         % Extract the next population
         pop=extractPopDIS(opt,out);
+    case 'fit'
+        % Extract the next population
         
     otherwise
         error('sorting function does not exsit!');
