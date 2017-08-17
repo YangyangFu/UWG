@@ -1,4 +1,4 @@
-function state = statpop(pop, state)
+function state = statpop(opt,pop, state)
 % Function: state = statpop(pop, state)
 % Description: Statistic Population.
 %
@@ -15,16 +15,42 @@ state.frontCount = rankVec(N);
 state.firstFrontCount = length( find(rankVec==1) );
 
 % worst feasible solution when nObj==1
-popsize=length(pop);
-feas=zeros(popsize);
+
+feas=zeros(N);
 if length(pop(1).obj) == 1
-    for i = 1:popsize
+    for i = 1:N
       if pop(i).nViol==0 
       feas(i) = pop(i).obj;
       end
     end
    state.worstFeas = max(feas); 
 end
+
+% statistics for single-objective optimization
+% individual current best
+
+if opt.numObj==1
+    fitness=vertcat(pop.fitness);
+    individual=vertcat(pop.var);
+    cons=vertcat(pop.violSum);
+    
+    % best fitness in current generation
+    [state.bestfitness,ind]=min(fitness);
+    % best individual in current generation
+    state.bestindividual=individual(ind); 
+    
+    % range
+    state.minfitness=state.bestfitness;
+    state.maxfitness=max(fitness);
+    state.averagefitness=mean(fitness);
+    
+    % max constraint: plot the maximum constraints
+    state.maxconstraint=max(cons);
+    
+    % add fitness 
+    state.fitness=fitness;
+end
+
 end
 
 

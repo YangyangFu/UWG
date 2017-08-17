@@ -1,10 +1,10 @@
 #NSGA2
-popsize 200
-maxGen 100
+popsize 40
+maxGen 60
 numVar 7
 numObj 1
 numCons 9
-stateFieldNames	currentGen	evaluateCount	totalTime	firstFrontCount	frontCount	avgEvalTime	worstFeas	
+stateFieldNames	currentGen	evaluateCount	totalTime	firstFrontCount	frontCount	avgEvalTime	worstFeas	bestfitness	minfitness	maxfitness	bestindividual	averagefitness	maxconstraint	fitness	
 #end
 
 

@@ -15,8 +15,9 @@ switch sortingfun
         % Extract the next population
         pop=extractPopDIS(opt,out);
     case 'fit'
-        % Extract the next population
-        
+        % Extract the next population based on fitness, especially used for
+        % single objective GA. At this moment, see function extractPopFit
+        pop = extractPopFit(opt, out);
     otherwise
         error('sorting function does not exsit!');
 end

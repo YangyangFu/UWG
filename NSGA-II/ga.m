@@ -1,4 +1,4 @@
-function result = ga(opt,varargin)
+function [result,surrogateOpt] = ga(opt,surrogateOpt,varargin)
 %This is a real coded GA for mixed integer constrained optimization
 %problem.
 %
@@ -47,9 +47,14 @@ state = struct(...
     'firstFrontCount', 0,...    % individual number of first front
     'frontCount', 0,...         % number of front
     'avgEvalTime', 0, ...       % average evaluation time of objective function (current generation)
-    'worstFeas',0 ...           % worst feasible solution in current generation, =0 if all solutions are infeasible or nObj>1
-    );
-
+    'worstFeas',0, ...          % worst feasible solution in current generation, =0 if all solutions are infeasible or nObj>1
+    'bestfitness',0,...         % best fitness for single-objective optimization
+    'minfitness',0,...          % minimum fitness for single-objective optimization
+    'maxfitness',0,...          % maximum fitness for single-objective optimization
+    'bestindividual',0,...      % best individual for single-objective optimziation
+    'averagefitness',0,...      % average fitness for single-objective optimization
+    'maxconstraint',0,...         % maximum constraint for single-objective optimziation
+    'fitness',[]);
 result.pops     = repmat(pop, [opt.maxGen, 1]);     % each row is the population of one generation
 result.states   = repmat(state, [opt.maxGen, 1]);   % each row is the optimizaiton state of one generation
 result.opt      = opt;                              % use for output
@@ -58,6 +63,11 @@ result.opt      = opt;                              % use for output
 global STOP_NSGA;   %STOP_NSGA : used in GUI , if STOP_NSGA~=0, then stop the optimizaiton
 STOP_NSGA = 0;
 
+% plot set
+figure;
+hold on;
+axe1=subplot(2,1,1);
+axe2=subplot(2,1,2);
 
 %======================================================================
 %                   Initialization at generation=0
@@ -68,6 +78,59 @@ pop = opt.initfun{1}(opt, pop, opt.initfun{2:end});
 % now we need rank the solutions in current generation
 % calculate the fitness value for single obejctive
 [opt, pop, state] = fitnessValue(opt, pop, state);
+
+% if surrogate model is set to use, then train surrogate models for each
+% objective and constraints, if neccessary.
+if opt.surrogate.use
+    
+    surrogatemodel=cell(opt.maxGen,nObj+nCons);
+    %surrogateperf=zeros(opt.maxGen,nObj+nCons);
+    for i=1:length(pop)
+        surrogateOpt.traindataAll(i,:)=pop(i).var;
+        surrogateOpt.truefitnessAll(i,:)=pop(i).obj;
+        surrogateOpt.trueconstraintAll(i,:)=pop(i).cons;
+    end
+    
+    % train surrogate model for objective functions
+    for j=1:nObj
+        
+        [net,surrogateOpt]=trainsurrogate(surrogateOpt.traindataAll,surrogateOpt.truefitnessAll(:,j),...
+            surrogateOpt,opt);
+        surrogatemodel{ngen,j}=net;
+        %surrogateperf(ngen,j)=surrogateOpt.performance;
+    end
+    
+    % train surrogate model for constraint functions. since, in this case,
+    % constraints computation is simple,only some of them need to be
+    % fitted.
+    consSurrogateIndex=surrogateOpt.consSurrogateIndex;
+    if ~isempty(consSurrogateIndex)
+        for j=1:length(consSurrogateIndex)
+            [net,surrogateOpt]=trainsurrogate(surrogateOpt.traindataAll,...
+                surrogateOpt.trueconstraintAll(:,consSurrogateIndex(j)),...
+                surrogateOpt,opt);
+            surrogatemodel{ngen,consSurrogateIndex(j)+nObj}=net;
+        end
+    end
+    
+    for i=1:length(pop)
+    
+    pop(i).surrcons=pop(i).cons;
+    pop(i).nViolSurr=pop(i).nViol;
+    pop(i).violSumSurr=pop(i).violSum;
+    end
+    
+    surrogatemodel(ngen+1,:)=surrogatemodel(ngen,:);
+    
+end
+% state
+state.currentGen = ngen;
+state.totalTime = toc(tStart);
+state = statpop(opt,pop, state);
+
+result.pops(1, :) = pop;
+result.states(1)  = state;
+
 %======================================================================
 %                   Main Loop
 %======================================================================
@@ -80,19 +143,20 @@ while( ngen < opt.maxGen && STOP_NSGA==0)
     fprintf('*      Current generation %d / %d\n', ngen, opt.maxGen);
     fprintf('************************************************************\n');
     
+ if (~opt.surrogate.use) % don't use surrogate    
     % Generate new population through selection, crossover, and mutation
     % operators
-    % 1. Make new pop
+    % 1. Create new pop
     %****************************************
-    % selection operator
+     % selection operator
     newpop = selectOp(opt, pop);
-    % crossover operator
+     % crossover operator
     newpop = crossoverOp(opt, newpop,state);
-    % mutation operator
+     % mutation operator
     newpop = mutationOp(opt, newpop, state);
-    % integer variable handling
+      % integer variable handling
     newpop = integerOp(opt, newpop);
-    % evaluate new pop
+      % evaluate new pop
     [newpop, state] = evaluate(opt, newpop, state);
      
     % 2. Combine the new population and old population : combinepop = pop + newpop
@@ -102,24 +166,28 @@ while( ngen < opt.maxGen && STOP_NSGA==0)
     % calculate the fitness value for single obejctive
     [opt, combinepop, state] = fitnessValue(opt, combinepop, state);       
     pop = extractPopFit(opt, combinepop);
+    
+ else % use sorrogate 
+   [opt,pop,state,surrogatemodel,surrogateOpt]=surrogate...
+            (opt,pop,state, surrogatemodel,surrogateOpt);       
+ end
+% 5. Save current generation results
+state.totalTime = toc(tStart);
+state = statpop(opt,pop, state);
 
-    
-       % 5. Save current generation results
-    state.totalTime = toc(tStart);
-    state = statpop(pop, state);
-    
-    result.pops(ngen, :) = pop;
-    result.states(ngen)  = state;
-
-    % 6. plot current population and output
-    %if( mod(ngen, opt.plotInterval)==0 )
-    %    plotnsga(result, ngen);
-    %end
-    %if( mod(ngen, opt.outputInterval)==0 )
-    %    opt = callOutputfuns(opt, state, pop);
-    %end
-    
+result.pops(ngen, :) = pop;
+result.states(ngen)  = state;
+ % 6. plot current population and output
+if( mod(ngen, opt.plotInterval)==0 )
+    plotga(result,ngen,axe1,axe2);
 end
+
+end
+
+%if( mod(ngen, opt.outputInterval)==0 )
+%    opt = callOutputfuns(opt, state, pop);
+%end
+
 % call output function for closing file
 opt = callOutputfuns(opt, state, pop, -1);
 

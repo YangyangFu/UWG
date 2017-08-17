@@ -10,8 +10,8 @@
 
 
 options = nsgaopt();                    % create default options structure
-options.popsize = 50;                   % populaion size
-options.maxGen  = 100;                  % max generation
+options.popsize = 100;                   % populaion size
+options.maxGen  = 50;                  % max generation
 
 options.numObj = 2;                     % number of objectives
 options.numVar = 2;                     % number of design variables
@@ -19,9 +19,13 @@ options.numCons = 2;                    % number of constraints
 options.lb = [0.1  0];                  % lower bound of x
 options.ub = [1    5];                  % upper bound of x
 options.objfun = @TP_CONSTR_objfun;     % objective function handle
-options.consfun=@TP_CONSTR_consfun;
+options.consfun=@TP_CONSTR_objfun;
 options.plotInterval = 1;               % interval between two calls of "plotnsga". 
+%% ALGORITHM
+options.algorithm="nsga2"; % three options: nasga2, rnsga2, and rga
 
+
+%% CROSSOVER
 %options.crossover{1,1}='intermediate';
 %options.crossover{1,2}=0.8;
 %options.crossoverFraction=0.9;
@@ -36,7 +40,7 @@ options.mutation={'polynominal',20};
 options.mutationFraction=1./2;
 
 
-options.sortingfun={'nds',0.2};
+options.sortingfun={'dis',0.2};
 
 
 options.vartype=[1,2];

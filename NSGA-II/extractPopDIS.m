@@ -1,15 +1,6 @@
 function nextpop=extractPopDIS(opt,out)
 
-if ~iscell(out)
-    error ('illegal input arguments in extractPopDIS!')
-elseif length(out)<2
-    error('not enough input argments in extractPopDIS!')
-end
-
-
-
-feaspop=out{1,1};
-infeaspop=out{1,2};
+[feaspop,infeaspop]=split(out);
 
 % determine the popsize of extracted population
 if opt.surrogate.use==1
@@ -24,7 +15,7 @@ alpha=opt.sortingfun{1,2};
 if alpha>1
     warning ('alpha in DIS is larger than 1, which should be in [0 1].')
     alpha=min(1,alpha);
-elseif alpha==0;
+elseif alpha==0
     error ('alpha in DIS must be larger than 0, which should be in [0 1].')
 end
 

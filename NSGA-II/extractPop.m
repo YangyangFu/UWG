@@ -7,15 +7,7 @@ function nextpop = extractPop(opt, out)
 %    Date: 07/03/2017
 %*************************************************************************
 
-if ~iscell(out)
-    error ('illegal input arguments in extractPopDIS!')
-elseif length(out)>=2
-    error('excessive input argments in extractPopDIS!')
-end
-
-
-
-combinepop=out{1,1};
+combinepop=out;
 
 if opt.surrogate.use==1
     popsize=opt.surrogate.miu;

@@ -19,14 +19,14 @@ feasIndex=feas==0;
 obj=vertcat(pop.obj);
 violSum=vertcat(pop.violSum);
 if ~isempty(feasIndex)
-state.worstFeas=max(obj(feasIndex)); % worst feasible solution at current pops
+    state.worstFeas=max(obj(feasIndex)); % worst feasible solution at current pops
 end
     
 for i=1:n 
     if pop(i).nViol==0 % feasible solution;
        pop(i).fitness=obj(i);
     else % infeasible solution
-        pop(i).fitness=state.worstFeas+violSum(i);
+       pop(i).fitness=state.worstFeas+violSum(i);
     end
 end
         

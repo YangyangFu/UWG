@@ -16,7 +16,10 @@ surrogateOpt=struct(...
     'numObj',[],...;% number of output in surrogate model;
     ...
     'perfFun','productmoment',...% performance function 
-    'performance',0);% performance value
+    'performance',0,...% performance value
+    'traindataAll',[],... % train data X
+    'truefitnessAll',[],...% train data Y - fitness
+    'trueconstraintAll',[]); % train data Y - constraints
 
 
 

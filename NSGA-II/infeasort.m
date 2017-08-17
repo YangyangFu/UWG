@@ -1,6 +1,4 @@
-function [opt,feaspop,infeaspop,frontpop]=infeasort(opt,combinedpop)
-
-
+function [opt,combinedpop,frontpop]=infeasort(opt,combinedpop)
 
 
 %1. Split the combined pop into feasible and infeasible subsets
@@ -17,7 +15,7 @@ if ~isempty(infeaspop)
 [opt,infeaspop]=DIS(opt,infeaspop);
 frontpopinfeas=[];
 end
-
+combinedpop=[feaspop,infeaspop];
 frontpop=[frontpopfeas,frontpopinfeas];
 
 

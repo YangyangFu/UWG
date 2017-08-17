@@ -7,7 +7,7 @@ function [opt,nextpop,state,surrogatemodel,surrogateOpt,frontpop]=surrogate...
 % Algorithm:
 % 1. S=make new pop (P); creat surrogate pop S, where size S>P using selection,crossover and mutation;
 % 2. Approximate objectives and constraints in S;
-% 3. fast non-dominated sorting in S;
+% 3. Ranking in S (fast non-dominated sorting for multi-objective,and fitness evaluation for single-objective);
 % 4. Extract Q from S as pre-selection
 % 5. Evaluate Q in expensive function evalution;
 % 6. determine if the surrogate model should be updated.
@@ -17,29 +17,31 @@ function [opt,nextpop,state,surrogatemodel,surrogateOpt,frontpop]=surrogate...
 numObj=opt.numObj;
 numCons=opt.numCons;
 % 1. make new pop: S=new(P)
+% 1.1. new population from operators
 newpop=selectOp(opt,pop); % Select offsprings from parents and put them in mating pool
 newpop=crossoverOp(opt,newpop,state);
 newpop=mutationOp(opt,newpop,state);
 newpop = integerOp(opt,newpop);
 
-% 2. Evaluate the approximation value of both objectives and constraints
+% 1.2. Evaluate the approximation value of both objectives and constraints
 %    testing data
+
 for i=1:length(newpop)
-    traindata(i,:)=newpop(i).var;
+    testdata(i,:)=newpop(i).var;
 end
 
 ngen=state.currentGen;
 
-%   2.1 evalutae approximate objectives
+%   1.2.1 evalutae approximate objectives
 surrfitnessS=zeros(length(newpop),numObj);
 for i=1:numObj
     net=surrogatemodel{ngen,i};
-    [ predY,surrogateOpt] =testsurrogate( net,traindata,[],surrogateOpt );
+    [ predY,surrogateOpt] =testsurrogate( net,testdata,[],surrogateOpt );
 
     surrfitnessS(:,i)=predY;
 end
 
-%   2.2 evaluate approximate constraints.
+%   1.2.2 evaluate approximate constraints.
 %     (1) evaluate the expensive constraints
 consSurrogateIndex=surrogateOpt.consSurrogateIndex;% Only specific constraints need to be approximated
 surrconstraintS=zeros(length(newpop),numCons);
@@ -47,7 +49,7 @@ if ~isempty(consSurrogateIndex)
     
     for j=1:length(consSurrogateIndex)
         net=surrogatemodel{ngen,numObj+consSurrogateIndex(j)};
-        [predY,surrogateOpt]=testsurrogate(net,traindata,[],surrogateOpt);
+        [predY,surrogateOpt]=testsurrogate(net,testdata,[],surrogateOpt);
         surrconstraintS(:,consSurrogateIndex(j))=predY;
     end
 end
@@ -61,7 +63,9 @@ inexpconsIndex=setdiff(1:numCons,consSurrogateIndex);
 % put all the constraints together
 if ~isempty(inexpconsIndex)
     for i=1:length(newpop)
-        inexpSurrConstraint(i,:)=consfun(traindata(i,:));% evaluate the inexpensive constraints
+        % need revise because when evaluating the inexpensive cons, the
+        % objective function is called in this case.
+     [~,inexpSurrConstraint(i,:)]=consfun(testdata(i,:));% evaluate the inexpensive constraints
     end
     if size(inexpconsIndex,2)~=size(inexpSurrConstraint,2)
         error('inexpensive constraints number is not correct!')
@@ -89,7 +93,8 @@ for j=1:length(newpop)
         end
     end
     % save the objective values and constraints violation for ture
-    % model
+    % model. Mind that objetice value in both expensive eva and approximate
+    % eva wille be the same in this line.
     newpop(j).obj=newpop(j).surrfitness;
     newpop(j).cons=newpop(j).surrcons;
     
@@ -97,20 +102,33 @@ for j=1:length(newpop)
     newpop(j).violSum=newpop(j).violSumSurr;
 end
 
-%3. Fast Non-dominated Sorting
-[opt,out]=sorting(opt,newpop);
+   % 1.3 elitism
+   combinepop=[newpop,pop];
 
-%4. Extract Q from S;
-[opt,nextpop] = extract(opt, out);
+if numObj>1 % for multi-objective optimization
+    %2. Calculate fitness function:
+    % sort the individuals based on approximate fitness ranking
+    [opt,out]=sorting(opt,combinepop);
 
-%5. Expensive evaluation for both objectives and constraints
-[nextpop, state] = evaluate(opt, nextpop, state);
+    %3. Extract Q from S ;
+    [opt,nextpop] = extract(opt, out);
 
-%6. Non-dominated sorting using real fitness
-[opt,nextpopout,frontpop]=sorting(opt,nextpop);
-[opt,nextpop] = extract(opt, nextpopout);
+    %4. Expensive evaluation for both objectives and constraints
+    [nextpop, state] = evaluate(opt, nextpop, state);
 
-%7. Determine whether to update the surrogate model based on model
+    %5. Non-dominated sorting using real fitness
+    [opt,nextpop,frontpop]=sorting(opt,nextpop);
+    [opt,nextpop] = extract(opt, nextpop); % This code is unnecessary but is desired to keep the program running. Revise the structure if needed later.
+    
+else % for single-objective optimization
+    %2. Fitness value 
+     [opt, out, state] = fitnessValue(opt, combinepop, state); 
+    %3. Extact Q from S: sorting function has to be "fit"
+     [opt,nextpop] = extract(opt, out);
+    %4. 
+end
+
+%6. Determine whether to update the surrogate model based on model
 % preciseness.
 % calculate the prediction coefficient
 
@@ -123,14 +141,18 @@ surrfitnessP=vertcat(pop.surrfitness);
 for i=1:numObj
     [performance,surrogateOpt]=surrogateperf(truefitnessQ(:,i),surrfitnessQ(:,i),surrogateOpt);
     surrogatemodel{state.currentGen,i}.performance=performance;
-    if performance<=0.9 % update model
+    if performance<=0.8 % update model
         %extract the training data
         variableQ=vertcat(nextpop.var);
-        variableP=vertcat(pop.var);
-        traindatanew=[variableP;variableQ];
-        truefitness=[truefitnessP;truefitnessQ];
+        %variableP=vertcat(pop.var);
+        traindatanew=variableQ;
+        surrogateOpt.traindataAll=[surrogateOpt.traindataAll;traindatanew];
+        truefitnessnew=truefitnessQ;
+        surrogateOpt.truefitnessAll=[surrogateOpt.truefitnessAll;truefitnessnew];
         % train surrogate
-        [netnew,surrogateOpt]=trainsurrogate(traindatanew,truefitness(:,i),surrogateOpt,opt);
+        [netnew,surrogateOpt]=trainsurrogate(surrogateOpt.traindataAll,...
+            surrogateOpt.truefitnessAll(:,i),...
+            surrogateOpt,opt);
         surrogatemodel{state.currentGen+1,i}=netnew;
         
     else% do not update the surrogate model
@@ -151,14 +173,13 @@ if ~isempty(consSurrogateIndex)
             surrconstraintQ(:,consSurrogateIndex(i)),surrogateOpt);
         surrogatemodel{state.currentGen,i}.performance=performance;
         
-        if performance<=0.9 % update model
-            %extract the training data
-            variableQ=vertcat(nextpop.var);
-            variableP=vertcat(pop.var);
-            traindatanew=[variableP;variableQ];
-            trueconstraint=[trueconstraintP;trueconstraintQ];
+        if performance<=0.8 % update model
+            %extract the training data, same as in the objective value
+            trueconstraint=trueconstraintQ;
+            surrogateOpt.trueconstraintAll=[surrogateOpt.trueconstraintAll;trueconstraint];
             % train surrogate
-            [netnew,surrogateOpt]=trainsurrogate(traindatanew,trueconstraint(:,consSurrogateIndex(i)),surrogateOpt,opt);
+            [netnew,surrogateOpt]=trainsurrogate(surrogateOpt.traindataAll,...
+                surrogateOpt.trueconstraintAll(:,consSurrogateIndex(i)),surrogateOpt,opt);
             surrogatemodel{state.currentGen+1,consSurrogateIndex(i)+numObj}=netnew;
             
         else% do not update the surrogate model

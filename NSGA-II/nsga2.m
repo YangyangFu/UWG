@@ -90,7 +90,6 @@ pop = opt.initfun{1}(opt, pop, opt.initfun{2:end});
 [opt, pop,frontpop] = ndsort(opt, pop);
 
 
-
 % if surrogate model is set to use, then train surrogate models for each
 % objective and constraints, if neccessary.
 if opt.surrogate.use
@@ -98,15 +97,16 @@ if opt.surrogate.use
     surrogatemodel=cell(opt.maxGen,nObj+nCons);
     %surrogateperf=zeros(opt.maxGen,nObj+nCons);
     for i=1:length(pop)
-        traindata(i,:)=pop(i).var;
-        truefitness(i,:)=pop(i).obj;
-        trueconstraints(i,:)=pop(i).cons;
+        surrogateOpt.traindataAll(i,:)=pop(i).var;
+        surrogateOpt.truefitnessAll(i,:)=pop(i).obj;
+        surrogateOpt.trueconstraintAll(i,:)=pop(i).cons;
     end
     
     % train surrogate model for objective functions
     for j=1:nObj
         
-        [net,surrogateOpt]=trainsurrogate(traindata,truefitness(:,j),surrogateOpt,opt);
+        [net,surrogateOpt]=trainsurrogate(surrogateOpt.traindataAll,surrogateOpt.truefitnessAll(:,j),...
+            surrogateOpt,opt);
         surrogatemodel{ngen,j}=net;
         %surrogateperf(ngen,j)=surrogateOpt.performance;
     end
@@ -117,7 +117,8 @@ if opt.surrogate.use
     consSurrogateIndex=surrogateOpt.consSurrogateIndex;
     if ~isempty(consSurrogateIndex)
         for j=1:length(consSurrogateIndex)
-            [net,surrogateOpt]=trainsurrogate(traindata,trueconstraints(:,consSurrogateIndex(j)),...
+            [net,surrogateOpt]=trainsurrogate(surrogateOpt.traindataAll,...
+                surrogateOpt.trueconstraintAll(:,consSurrogateIndex(j)),...
                 surrogateOpt,opt);
             surrogatemodel{ngen,consSurrogateIndex(j)+nObj}=net;
         end
@@ -131,7 +132,6 @@ if opt.surrogate.use
     end
     
     surrogatemodel(ngen+1,:)=surrogatemodel(ngen,:);
-    
     
 end
 % state

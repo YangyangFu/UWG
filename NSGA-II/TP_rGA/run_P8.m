@@ -1,7 +1,7 @@
 
 options = nsgaopt();                    % create default options structure
-options.popsize = 200;                   % populaion size
-options.maxGen  = 100;                  % max generation
+options.popsize = 40;                   % populaion size
+options.maxGen  = 60;                  % max generation
 
 options.numObj = 1;                     % number of objectives
 options.numVar = 7;                     % number of design variables
@@ -26,7 +26,7 @@ options.mutation={'polynominal',20};
 options.mutationFraction=1./2;
 
 
-options.sortingfun={'fit'};
+options.sortingfun={'fit',0.2};
 
 
 options.vartype=[1,1,1,2,2,2,2];
@@ -36,9 +36,9 @@ options.initpop=[1,1,1,1,1,1,1];%[0.5 4;0.4 4];
 
 
 
-options.surrogate.use=0;
+options.surrogate.use=1;
 miu=options.popsize;
-lamda=miu;
+lamda=3*miu;
 
 options.surrogate.miu=miu;
 options.surrogate.lamda=lamda;
@@ -47,8 +47,8 @@ options.surrogate.lamda=lamda;
 surrogateOpt=getsurrogateOpt;
 
 nhidden=round(miu/3);
-surrogateOpt.numVar=2;
-surrogateOpt.numObj=1;
+surrogateOpt.numVar=options.numVar;
+surrogateOpt.numObj=options.numObj;
 surrogateOpt.model{1,1}='svm';
 surrogateOpt.model{1,2}='gs';
 surrogateOpt.model{1,3}=nhidden;
@@ -57,4 +57,4 @@ surrogateOpt.model{1,6}='kmedoids';
 
 surrogateOpt.consSurrogateIndex=[];
 
-result = ga(options,surrogateOpt);                % begin the optimization!
+[result,surrogateOpt] = ga(options,surrogateOpt);                % begin the optimization!

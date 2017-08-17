@@ -7,16 +7,13 @@ switch sortingfun
     case 'nds'
         % Fast non dominated sort
 
-        [opt, combinepop,frontpop] = ndsort(opt, combinepop);
+        [opt, out,frontpop] = ndsort(opt, combinepop);
       
-        out{1}=combinepop;
     case 'dis'
         % Deterministic infeasibility sort
 
-        [opt,feaspop,infeaspop,frontpop]=infeasort(opt,combinepop);
+        [opt,out,frontpop]=infeasort(opt,combinepop);
 
-        out{1}=feaspop;
-        out{2}=infeaspop;
     otherwise
         error('sorting function does not exsit!');
 end
