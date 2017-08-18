@@ -20,6 +20,8 @@ switch (strfun)
         fun = @mutationGaussian;
     case 'polynominal'
         fun = @mutationPolynominal;
+    case 'power'
+        fun = @mutationPower;
     otherwise
         error('NSGA2:MutationOpError', 'No support mutation operator!');
 end
@@ -120,7 +122,35 @@ child.var=parent.var+delq.*mutationlocation.*(ub-lb);
 
 end
 
+function child = mutationPower(parent,opt,state,probobility,options)
 
+
+p_real=options{1}; %10 
+p_integer=options{2};%4
+
+child=parent;
+nVar=length(parent);
+
+lb = opt.lb;
+ub = opt.ub;
+
+% power index
+type=opt.vartype;
+p = (type==1)*p_real + (type==2)*p_integer;
+
+
+s1=rand(1,nVar);
+r=rand(1,nVar);
+s=s1.^p;
+
+t=(parent.var-lb)./(ub-parent.var);
+
+mutationlocation=rand(1,nVar)<probobility; %prob=0.005
+
+child.var= (t<r).*(parent.var-mutationlocation.*s.*(parent.var-lb))+ ...
+    (t>=r).*(parent.var+mutationlocation.*s.*(ub-parent.var));
+
+end
 
 
 

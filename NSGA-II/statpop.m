@@ -31,13 +31,15 @@ end
 
 if opt.numObj==1
     fitness=vertcat(pop.fitness);
-    individual=vertcat(pop.var);
     cons=vertcat(pop.violSum);
     
+    for i=1:N
+    individual(i,:)=pop(i).var;
+    end
     % best fitness in current generation
     [state.bestfitness,ind]=min(fitness);
     % best individual in current generation
-    state.bestindividual=individual(ind); 
+    state.bestindividual=individual(ind,:); 
     
     % range
     state.minfitness=state.bestfitness;

@@ -21,11 +21,11 @@ ylabel(axe1,"Best Fitness");
 
 
 boxplot(axe2,fitness');
+xlim(axe2,[0,maxGen]);
 xticks([0:10:curGen]);
 xticklabels([0:10:curGen])
 title(axe2,"Range")
 xlabel(axe2,"Generation");
-xlim(axe2,[0,maxGen]);
 ylabel(axe2,"Range");
 
 end

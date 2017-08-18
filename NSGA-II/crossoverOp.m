@@ -20,6 +20,8 @@ switch( strfun )
         fun = @crsIntermediate;
     case 'simulatedbinary'
         fun= @crsSimulatedbinary;
+    case 'laplace'
+        fun = @crsLaplace;
     otherwise
         error('NSGA2:CrossoverOpError', 'No support crossover operator!');
 end
@@ -142,4 +144,44 @@ else
 end  
     
 end
+
+function [child1, child2] = crsLaplace(parent1, parent2,fraction,options,opt)
+
+nVar = length(parent1.var);
+a=options{1};
+b_real=options{2};
+b_integer=options{3};
+
+
+%crossover fraction
+crsFlag = rand(1, nVar) < fraction;
+
+%create children
+child1 = parent1;
+child2 = parent2;
+
+beta=zeros(1,nVar);
+b=b_real*(opt.vartype==1)+b_integer*(opt.vartype==2);
+
+if (isequal(parent1,parent2))==1 && rand(1)>0.5
+    child1=parent1;
+    child2=parent2;
+else
+    u=rand(1,nVar);
+    r=rand(1,nVar);
+    for i=1:nVar
+       if r(i)<=1/2
+           beta(i)=a-b(i)*log10(u(i));
+       else
+           beta(i)=a+b(i)*log10(u(i));
+       end
+       
+    end
+    child1.var=parent1.var + crsFlag .* beta .* abs(parent1.var-parent2.var); 
+    child2.var=parent2.var + crsFlag .* beta .* abs(parent1.var-parent2.var);
     
+end  
+
+
+
+end
