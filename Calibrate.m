@@ -1,129 +1,46 @@
-function [ UWGCalibrate ] = Calibrate( inputPath, interfacePath, bld2Path, bld3Path, bld4Path, bld6Path, bld10Path, bld14Path, resultPath, outputPath )
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
 
-%% Input and output path
-currentPath=pwd;
-inputPath = strcat(currentPath,'\SensitivityAnalysis\Inputs.xlsx');
-interfacePath = strcat(currentPath,'\data\RunUWG_AD_GA.xlsm');
-bld2Path = strcat(currentPath,'\data\DOERefBuildings\BLD2.xlsx');
-bld3Path = strcat(currentPath,'\data\DOERefBuildings\BLD3.xlsx');
-bld4Path = strcat(currentPath,'\data\DOERefBuildings\BLD4.xlsx');
-bld6Path = strcat(currentPath,'\data\DOERefBuildings\BLD6.xlsx');
-bld10Path = strcat(currentPath,'\data\DOERefBuildings\BLD10.xlsx');
-bld14Path = strcat(currentPath,'\data\DOERefBuildings\BLD14.xlsx');
-resultPath = strcat(currentPath,'\output\UWGoutput.xlsx');
-outputPath = strcat(currentPath,'\SensitivityAnalysis\2016data\OutputsDec.xlsx');
+options = nsgaopt();                    % create default options structure
+options.popsize = 200;                   % populaion size
+options.maxGen  = 40;                  % max generation
 
-%% Update model inputs
-    % Update meteorological factor
-    % xlswrite(interfacePath,num(i,1),1,'D4');    % A1
-    xlswrite(interfacePath,num(i,2),1,'D5');    % A2
-    xlswrite(interfacePath,num(i,3),1,'D6');    % A3
-    % xlswrite(interfacePath,num(i,4),1,'D9');    % A4
-    xlswrite(interfacePath,num(i,5),1,'D10');   % A5
-    % xlswrite(interfacePath,num(i,6),1,'D11');   % A6
-    % xlswrite(interfacePath,num(i,7),1,'D12');   % A7
-    
-    % Update urban characteristics
-    % xlswrite(interfacePath,num(i,8),1,'D15');   % B1
-    xlswrite(interfacePath,num(i,9),1,'D16');   % B2
-    xlswrite(interfacePath,num(i,10),1,'D17');  % B3
-    % xlswrite(interfacePath,num(i,11),1,'D18');  % B4
-    xlswrite(interfacePath,num(i,12),1,'D19');  % B5
-    % xlswrite(interfacePath,num(i,13),1,'D21');  % B6
-    % xlswrite(interfacePath,num(i,14),1,'D23');  % B7
-    
-    % Update vegetation varible
-    % xlswrite(interfacePath,num(i,15),1,'D25');  % C1
-    % xlswrite(interfacePath,num(i,16),1,'D26');  % C2
-    % xlswrite(interfacePath,num(i,17),1,'D29');  % C3
-    % xlswrite(interfacePath,num(i,18),1,'D30');  % C4
-    % xlswrite(interfacePath,num(i,19),1,'D31');  % C5
-    % xlswrite(interfacePath,num(i,20),1,'D32');  % C6
-    
-    % Update building system BLD2
-    % xlswrite(bld2Path,num(i,21),1,'D5');    % D1
-    % xlswrite(bld2Path,num(i,22),3,'E38');   % D2
-    % xlswrite(bld2Path,num(i,23),3,'E8');    % D3
-    % xlswrite(bld2Path,num(i,24),3,'E9');    % D4
-    % xlswrite(bld2Path,num(i,25),2,'U3');    % D5
-    % xlswrite(bld2Path,num(i,26),3,'E12');   % D6
-    xlswrite(bld2Path,num(i,27),4,'G11');   % D7
-    xlswrite(bld2Path,num(i,28),2,'N3');    % D8
-    % xlswrite(bld2Path,num(i,29),2,'M3');    % D9
-    % xlswrite(bld2Path,num(i,30),2,'L6');    % D10
-    
-    % Update building system BLD3
-    % xlswrite(bld3Path,num(i,21),1,'D5');    % D1
-    % xlswrite(bld3Path,num(i,22),3,'E38');   % D2
-    % xlswrite(bld3Path,num(i,23),3,'E8');    % D3
-    % xlswrite(bld3Path,num(i,24),3,'E9');    % D4
-    % xlswrite(bld3Path,num(i,25),2,'U3');    % D5
-    % xlswrite(bld3Path,num(i,26),3,'E12');   % D6
-    xlswrite(bld3Path,num(i,27),4,'G11');   % D7
-    xlswrite(bld3Path,num(i,28),2,'N3');    % D8
-    % xlswrite(bld3Path,num(i,29),2,'M3');    % D9
-    % xlswrite(bld3Path,num(i,30),2,'L6');    % D10
-    
-    % Update building system BLD4
-    % xlswrite(bld4Path,num(i,21),1,'D5');    % D1
-    % xlswrite(bld4Path,num(i,22),3,'E38');   % D2
-    % xlswrite(bld4Path,num(i,23),3,'E8');    % D3
-    % xlswrite(bld4Path,num(i,24),3,'E9');    % D4
-    % xlswrite(bld4Path,num(i,25),2,'U3');    % D5
-    % xlswrite(bld4Path,num(i,26),3,'E12');   % D6
-    xlswrite(bld4Path,num(i,27),4,'G11');   % D7
-    xlswrite(bld4Path,num(i,28),2,'N3');    % D8
-    % xlswrite(bld4Path,num(i,29),2,'M3');    % D9
-    % xlswrite(bld4Path,num(i,30),2,'L6');    % D10
-    
-    % Update building system BLD6
-    % xlswrite(bld6Path,num(i,21),1,'D5');    % D1
-    % xlswrite(bld6Path,num(i,22),3,'E38');   % D2
-    % xlswrite(bld6Path,num(i,23),3,'E8');    % D3
-    % xlswrite(bld6Path,num(i,24),3,'E9');    % D4
-    % xlswrite(bld6Path,num(i,25),2,'U3');    % D5
-    % xlswrite(bld6Path,num(i,26),3,'E12');   % D6
-    xlswrite(bld6Path,num(i,27),4,'G11');   % D7
-    xlswrite(bld6Path,num(i,28),2,'N3');    % D8
-    % xlswrite(bld6Path,num(i,29),2,'M3');    % D9
-    % xlswrite(bld6Path,num(i,30),2,'L6');    % D10
-    
-    % Update building system BLD10
-    % xlswrite(bld10Path,num(i,21),1,'D5');    % D1
-    % xlswrite(bld10Path,num(i,22),3,'E38');   % D2
-    % xlswrite(bld10Path,num(i,23),3,'E8');    % D3
-    % xlswrite(bld10Path,num(i,24),3,'E9');    % D4
-    % xlswrite(bld10Path,num(i,25),2,'U3');    % D5
-    % xlswrite(bld10Path,num(i,26),3,'E12');   % D6
-    xlswrite(bld10Path,num(i,27),4,'G11');   % D7
-    xlswrite(bld10Path,num(i,28),2,'N3');    % D8
-    % xlswrite(bld10Path,num(i,29),2,'M3');    % D9
-    % xlswrite(bld10Path,num(i,30),2,'L6');    % D10
-    
-    % Update building system BLD14
-    % xlswrite(bld14Path,num(i,21),1,'D5');    % D1
-    % xlswrite(bld14Path,num(i,22),3,'E38');   % D2
-    % xlswrite(bld14Path,num(i,23),3,'E8');    % D3
-    % xlswrite(bld14Path,num(i,24),3,'E9');    % D4
-    % xlswrite(bld14Path,num(i,25),2,'U3');    % D5
-    % xlswrite(bld14Path,num(i,26),3,'E12');   % D6
-    xlswrite(bld14Path,num(i,27),4,'G11');   % D7
-    xlswrite(bld14Path,num(i,28),2,'N3');    % D8
-    % xlswrite(bld14Path,num(i,29),2,'M3');    % D9
-    % xlswrite(bld14Path,num(i,30),2,'L6');    % D10
-    
-%% Run simulation
-    UWGGA;
-    
-%% Calculate and output the objective function
+options.numObj = 1;                     % number of objectives
+options.numVar = 8;                     % number of design variables
+options.numCons = 0;                    % number of constraints
+options.lb = [50,100,0.1,0.1,0.15,800,20,10];                  % lower bound of x
+options.ub = [100,200,0.9,0.9,0.35,1200,24,16];                  % upper bound of x
+options.objfun = @ObjectiveFunction;     % objective function handle
+options.consfun=@ObjectiveFunction;
+options.plotInterval = 1;               % interval between two calls of "plotnsga". 
+
+options.crossover={'laplace',0,0.15,0.35};
+options.crossoverFraction=0.8;
+options.mutation={'power',10,4};
+options.mutationFraction=0.005;
 
 
-%% GA search
+options.sortingfun={'fit',0.2};
+options.vartype=[1,1,1,2,2,2,2];
+options.useParallel='no';
+options.poolsize=20;
+options.initpop=[80,150,0.5,0.5,0.2,1000,22,13];%[0.5 4;0.4 4];
 
+% options for surrogate model
+options.surrogate.use=1;
+miu=options.popsize;
+lamda=3*miu;
 
-%% Output final solutions
+options.surrogate.miu=miu;
+options.surrogate.lamda=lamda;
 
+surrogateOpt=getsurrogateOpt;
+nhidden=round(miu/3);
+surrogateOpt.numVar=options.numVar;
+surrogateOpt.numObj=options.numObj;
+surrogateOpt.model{1,1}='svm';
+surrogateOpt.model{1,2}='gs';
+surrogateOpt.model{1,3}=nhidden;
+surrogateOpt.model{1,5}='euclidean';
+surrogateOpt.model{1,6}='kmedoids';
+surrogateOpt.consSurrogateIndex=[];
 
-end
+[result,surrogateOpt] = ga(options,surrogateOpt);                % begin the optimization!
