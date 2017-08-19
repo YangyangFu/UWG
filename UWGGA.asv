@@ -229,7 +229,7 @@ function [new_climate_file,gaTPredict] = UWGGA(CL_EPW_PATH,CL_EPW,CL_XML_PATH,CL
         [zone, ~, ~] = xlsread(xml_location,1,'AA3');
         [num, ~, ~] = xlsread(xml_location,1,'S4:U19');
         [area, ~, ~ ] = xlsread(xml_location,1,'P4:R19');
-        t4=toc(t4_s)
+        t4=toc(t4_s);
         % Road (Assume 0.5m of asphalt)
         t5_s=tic;
         emis = 0.93;
@@ -238,7 +238,7 @@ function [new_climate_file,gaTPredict] = UWGGA(CL_EPW_PATH,CL_EPW,CL_XML_PATH,CL
         thickness = 0.05 * ones (ceil(d_road/0.05),1);
         road = Element(alb_road,emis,thickness,[asphalt;asphalt;asphalt;asphalt;asphalt;asphalt;asphalt;asphalt;asphalt;asphalt;],0,293,1);
         road.vegCoverage = min(vegCover/(1-bldDensity),1);
-        t5=toc(t5_s)
+        t5=toc(t5_s);
         % Define building energy models
         t6_s=tic;        
         k = 0;
@@ -262,12 +262,10 @@ function [new_climate_file,gaTPredict] = UWGGA(CL_EPW_PATH,CL_EPW,CL_XML_PATH,CL
         end
         t6=toc(t6_s)
         % Reference site class (also include VDM)
-        t7_s=tic;
         RSM = RSMDef(lat,lon,GMT,h_obs,weather.staTemp(1),weather.staPres(1),geoParam);
         USM = RSMDef(lat,lon,GMT,bldHeight/10,weather.staTemp(1),weather.staPres(1),geoParam);
-        t7=toc(t7_s)
+
         % Create UCM class (use road characteristics from BEM)
-        t8_s=tic;
         rural = road;
         rural.vegCoverage = rurVegCover;
         T_init = weather.staTemp(1);
@@ -275,11 +273,11 @@ function [new_climate_file,gaTPredict] = UWGGA(CL_EPW_PATH,CL_EPW,CL_XML_PATH,CL
         UCM = UCMDef(bldHeight,bldDensity,verToHor,treeCoverage,...
             sensAnth,latAnth,T_init,H_init,weather.staUmod(1),geoParam,r_glaze,SHGC,alb_wall,road,h_mix); 
         % UCM.h_mix = h_mix;
-        t8=toc(t8_s)
+        
         % Misc. stuff
         soilindex1 = 1;
         soilindex2 = 1;
-        t=[t1,t2,t3,t4,t5,t6,t7,t8]
+
     elseif strcmp(ext,'.m')
         % Run matlab script to generate UCM, UBL, etc.
         run(xml_location);

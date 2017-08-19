@@ -1,9 +1,12 @@
+function readDOE
 % Read Excel files of DOE buildings
 % Sheet 1 = BuildingSummary
 % Sheet 2 = ZoneSummary
 % Sheet 3 = LocationSummary
 % Sheet 4 = Schedules
 % Note BLD8 & 10 = school
+% Revisions: Yangyang Fu
+%    Use function instead of script to avoid memory issue in optimization
 
 % DOE Building Types
 bldType = {'FullServiceRestaurant';
@@ -294,7 +297,9 @@ end
 % refBEM(6,2,1).building.glazingRatio = 0.3;
 
 save ('RefDOE.mat','refDOE','refBEM','Schedule');
-
+%clear functions;
+clear all;
+end
 % wall & roof definition based on material
 % Material,
 %     1/2IN Gypsum,            !- Name
