@@ -58,16 +58,10 @@ state = struct(...
 result.pops     = repmat(pop, [opt.maxGen, 1]);     % each row is the population of one generation
 result.states   = repmat(state, [opt.maxGen, 1]);   % each row is the optimizaiton state of one generation
 result.opt      = opt;                              % use for output
-
+result.surrogatemodel = cell(opt.maxGen,nObj+nCons);
 % global variables
-global STOP_NSGA;   %STOP_NSGA : used in GUI , if STOP_NSGA~=0, then stop the optimizaiton
-STOP_NSGA = 0;
 
 % plot set
-figure;
-hold on;
-axe1=subplot(2,1,1);
-axe2=subplot(2,1,2);
 
 %======================================================================
 %                   Initialization at generation=0
@@ -83,20 +77,24 @@ pop = opt.initfun{1}(opt, pop, opt.initfun{2:end});
 % objective and constraints, if neccessary.
 if opt.surrogate.use
     
-    surrogatemodel=cell(opt.maxGen,nObj+nCons);
+
     %surrogateperf=zeros(opt.maxGen,nObj+nCons);
     for i=1:length(pop)
         surrogateOpt.traindataAll(i,:)=pop(i).var;
         surrogateOpt.truefitnessAll(i,:)=pop(i).obj;
-        surrogateOpt.trueconstraintAll(i,:)=pop(i).cons;
+        if nCons==0
+           surrogateOpt.trueconstraintAll=[];
+        else
+           surrogateOpt.trueconstraintAll(i,:)=pop(i).cons;
+        end
     end
     
     % train surrogate model for objective functions
     for j=1:nObj
         
-        [net,surrogateOpt]=trainsurrogate(surrogateOpt.traindataAll,surrogateOpt.truefitnessAll(:,j),...
+        [net.net,surrogateOpt]=trainsurrogate(surrogateOpt.traindataAll,surrogateOpt.truefitnessAll(:,j),...
             surrogateOpt,opt);
-        surrogatemodel{ngen,j}=net;
+        result.surrogatemodel{ngen,j}=net;
         %surrogateperf(ngen,j)=surrogateOpt.performance;
     end
     
@@ -106,10 +104,10 @@ if opt.surrogate.use
     consSurrogateIndex=surrogateOpt.consSurrogateIndex;
     if ~isempty(consSurrogateIndex)
         for j=1:length(consSurrogateIndex)
-            [net,surrogateOpt]=trainsurrogate(surrogateOpt.traindataAll,...
+            [net.net,surrogateOpt]=trainsurrogate(surrogateOpt.traindataAll,...
                 surrogateOpt.trueconstraintAll(:,consSurrogateIndex(j)),...
                 surrogateOpt,opt);
-            surrogatemodel{ngen,consSurrogateIndex(j)+nObj}=net;
+            result.surrogatemodel{ngen,consSurrogateIndex(j)+nObj}=net;
         end
     end
     
@@ -120,7 +118,7 @@ if opt.surrogate.use
     pop(i).violSumSurr=pop(i).violSum;
     end
     
-    surrogatemodel(ngen+1,:)=surrogatemodel(ngen,:);
+    result.surrogatemodel(ngen+1,:)=result.surrogatemodel(ngen,:);
     
 end
 % state
@@ -131,10 +129,17 @@ state = statpop(opt,pop, state);
 result.pops(1, :) = pop;
 result.states(1)  = state;
 
+% plot
+figure;
+hold on;
+axe1=subplot(2,1,1);
+axe2=subplot(2,1,2);
+plotga(result,ngen,axe1,axe2);
+
 %======================================================================
 %                   Main Loop
 %======================================================================
-while( ngen < opt.maxGen && STOP_NSGA==0)
+while( ngen < opt.maxGen)
     % 0. Display some information
     ngen = ngen+1;
     state.currentGen = ngen;
@@ -168,8 +173,8 @@ while( ngen < opt.maxGen && STOP_NSGA==0)
     pop = extractPopFit(opt, combinepop);
     
  else % use sorrogate 
-   [opt,pop,state,surrogatemodel,surrogateOpt]=surrogate...
-            (opt,pop,state, surrogatemodel,surrogateOpt);       
+   [opt,pop,state,result.surrogatemodel,surrogateOpt]=surrogate...
+            (opt,pop,state, result.surrogatemodel,surrogateOpt);       
  end
 % 5. Save current generation results
 state.totalTime = toc(tStart);

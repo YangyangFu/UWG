@@ -14,7 +14,7 @@ function [new_climate_file,gaTPredict] = UWGGA(CL_EPW_PATH,CL_EPW,CL_XML_PATH,CL
     %   - https://github.com/hansukyang/UWG_Matlab
     % =========================================================================
 
-    close all;
+    %close all;
     ver = 4.1;
     % 4.1 (beta) updates
     %   - changed EPW output to rural wind speed again
@@ -146,7 +146,6 @@ function [new_climate_file,gaTPredict] = UWGGA(CL_EPW_PATH,CL_EPW,CL_XML_PATH,CL
     % layer thickness control are only performed f or XML. (should update) 
     [~,~,ext] = fileparts(xml_location);
     if strcmp(ext,'.xlsm')      % Excel input
-        t1_s=tic;
         % Create simulation & weather class
         [num, ~, ~] = xlsread(xml_location,1,'N24:N34');
         Month = num(1);         % starting month (1-12)
@@ -171,8 +170,6 @@ function [new_climate_file,gaTPredict] = UWGGA(CL_EPW_PATH,CL_EPW,CL_XML_PATH,CL
         writeMAT = txt(1);
         writeEPW = txt(2);
         writeXLS = txt(3);
-        t1=toc(t1_s)
-        t2_s=tic;
         % Urban microclimate parameters
         [num, ~, ~] = xlsread(xml_location,1,'D4:D32');
         h_ubl1 = num(1);        % ubl height - day (m)
@@ -215,32 +212,24 @@ function [new_climate_file,gaTPredict] = UWGGA(CL_EPW_PATH,CL_EPW,CL_XML_PATH,CL
             latTree,latGrss,albVeg,vegStart,vegEnd,nightStart,nightEnd,windMin,wgmax,c_exch,maxdx,...
             g, cp, vk, r, rv, lv, pi(), sigma, waterDens, lvtt, tt, estt, cl, cpv, b, cm, colburn);
         UBL = UBLDef('C',charLength,weather.staTemp(1),maxdx,geoParam.dayBLHeight,geoParam.nightBLHeight); 
-        t2=toc(t2_s)
         % Traffic schedule
-        t3_s=tic;
         [SchTraffic, ~, ~] = xlsread(xml_location,1,'H4:J27');
         SchTraffic = transpose(SchTraffic);
-        t3=toc(t3_s)
         % Define BEM for each DOE type (read the fraction)
-        t4_s=tic;
         readDOE;
         load ('RefDOE.mat');
  
         [zone, ~, ~] = xlsread(xml_location,1,'AA3');
         [num, ~, ~] = xlsread(xml_location,1,'S4:U19');
         [area, ~, ~ ] = xlsread(xml_location,1,'P4:R19');
-        t4=toc(t4_s)
         % Road (Assume 0.5m of asphalt)
-        t5_s=tic;
         emis = 0.93;
         d_road = 0.5;
         asphalt = Material (1.0,1.6e6);
         thickness = 0.05 * ones (ceil(d_road/0.05),1);
         road = Element(alb_road,emis,thickness,[asphalt;asphalt;asphalt;asphalt;asphalt;asphalt;asphalt;asphalt;asphalt;asphalt;],0,293,1);
         road.vegCoverage = min(vegCover/(1-bldDensity),1);
-        t5=toc(t5_s)
-        % Define building energy models
-        t6_s=tic;        
+        % Define building energy models      
         k = 0;
         r_glaze = 0;
         SHGC = 0;
@@ -260,14 +249,10 @@ function [new_climate_file,gaTPredict] = UWGGA(CL_EPW_PATH,CL_EPW,CL_XML_PATH,CL
                 end
             end 
         end
-        t6=toc(t6_s)
         % Reference site class (also include VDM)
-        t7_s=tic;
         RSM = RSMDef(lat,lon,GMT,h_obs,weather.staTemp(1),weather.staPres(1),geoParam);
         USM = RSMDef(lat,lon,GMT,bldHeight/10,weather.staTemp(1),weather.staPres(1),geoParam);
-        t7=toc(t7_s)
         % Create UCM class (use road characteristics from BEM)
-        t8_s=tic;
         rural = road;
         rural.vegCoverage = rurVegCover;
         T_init = weather.staTemp(1);
@@ -275,11 +260,9 @@ function [new_climate_file,gaTPredict] = UWGGA(CL_EPW_PATH,CL_EPW,CL_XML_PATH,CL
         UCM = UCMDef(bldHeight,bldDensity,verToHor,treeCoverage,...
             sensAnth,latAnth,T_init,H_init,weather.staUmod(1),geoParam,r_glaze,SHGC,alb_wall,road,h_mix); 
         % UCM.h_mix = h_mix;
-        t8=toc(t8_s)
         % Misc. stuff
         soilindex1 = 1;
         soilindex2 = 1;
-        t=[t1,t2,t3,t4,t5,t6,t7,t8]
     elseif strcmp(ext,'.m')
         % Run matlab script to generate UCM, UBL, etc.
         run(xml_location);
@@ -718,11 +701,11 @@ function [new_climate_file,gaTPredict] = UWGGA(CL_EPW_PATH,CL_EPW,CL_XML_PATH,CL
                 bTmassin(n,i) = BEM(i).mass.layerTemp(1);
                 bCOP(n,i) = BEM(i).building.copAdj;
             end
-            progressbar(it/simTime.nt); % Print progress
+            %progressbar(it/simTime.nt); % Print progress
         end
 
     end
-    progressbar(1); % Close progress bar
+    %progressbar(1); % Close progress bar
 
     % =========================================================================
     % Section 6 - Writing new EPW file

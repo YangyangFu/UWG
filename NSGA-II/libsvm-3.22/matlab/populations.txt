@@ -1,5 +1,5 @@
 #NSGA2
-popsize 200
+popsize 20
 maxGen 100
 numVar 7
 numObj 1

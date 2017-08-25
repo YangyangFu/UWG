@@ -37,6 +37,8 @@ switch model
         end
         options.optimizer=optimizer;
         net=svrtrain(trainX,trainY,options);
+    case 'bpann'
+        net=bpanntrain(trainX,trainY);
     otherwise
         error('surrogate model do not exist!')
 end

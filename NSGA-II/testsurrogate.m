@@ -14,12 +14,13 @@ switch surrmodel
         
     case 'svm'
         
-        if isfield(net,'performance');
+        if isfield(net,'performance')
             net=rmfield(net,'performance');
         end
         
         testY=svrpredict(net,X,Y);
-        
+    case 'bpann'
+        testY=bpannpredict(net,X);
     otherwise
         error('Surrogate model is not existed!')
 end
