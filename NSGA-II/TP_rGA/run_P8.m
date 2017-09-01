@@ -1,7 +1,7 @@
 
 options = nsgaopt();                    % create default options structure
-options.popsize = 20;                   % populaion size
-options.maxGen  = 100;                  % max generation
+options.popsize = 100;                   % populaion size
+options.maxGen  = 60;                  % max generation
 
 options.numObj = 1;                     % number of objectives
 options.numVar = 7;                     % number of design variables
@@ -53,7 +53,7 @@ surrogateOpt=getsurrogateOpt;
 nhidden=round(miu/3);
 surrogateOpt.numVar=options.numVar;
 surrogateOpt.numObj=options.numObj;
-surrogateOpt.model{1,1}='bpann';
+surrogateOpt.model{1,1}='svm';
 surrogateOpt.model{1,2}='gs';
 surrogateOpt.model{1,3}=nhidden;
 surrogateOpt.model{1,5}='euclidean';

@@ -36,6 +36,7 @@ switch model
             optimizer='ga';
         end
         options.optimizer=optimizer;
+        options.scale=1;
         net=svrtrain(trainX,trainY,options);
     case 'bpann'
         net=bpanntrain(trainX,trainY);

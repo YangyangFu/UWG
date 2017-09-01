@@ -36,7 +36,8 @@ pop = repmat( struct(...
     'violSum', 0,...
     'nViolSurr',0,...
     'violSumSurr',0,...
-    'fitness',0),...
+    'fitness',0,...
+    'expensive',0),... % flag for exensive evaluation: 0-false, 1-true
     [1,popsize]);
 
 % state: optimization state of one generation
@@ -68,7 +69,13 @@ result.surrogatemodel = cell(opt.maxGen,nObj+nCons);
 %======================================================================
 ngen = 1;
 pop = opt.initfun{1}(opt, pop, opt.initfun{2:end});
+
+% expensively evaluate the individuals
 [pop, state] = evaluate(opt, pop, state);
+% save expensive evaluations
+if opt.surrogate.use==1
+    surrogateOpt.expensivePop=pop;
+end
 % now we need rank the solutions in current generation
 % calculate the fitness value for single obejctive
 [opt, pop, state] = fitnessValue(opt, pop, state);
@@ -77,7 +84,6 @@ pop = opt.initfun{1}(opt, pop, opt.initfun{2:end});
 % objective and constraints, if neccessary.
 if opt.surrogate.use
     
-
     %surrogateperf=zeros(opt.maxGen,nObj+nCons);
     for i=1:length(pop)
         surrogateOpt.traindataAll(i,:)=pop(i).var;
@@ -155,13 +161,15 @@ while( ngen < opt.maxGen)
     %****************************************
      % selection operator
     newpop = selectOp(opt, pop);
+     
      % crossover operator
-    newpop = crossoverOp(opt, newpop,state);
+    newpop = crossoverOp(opt, newpop,state);    
      % mutation operator
     newpop = mutationOp(opt, newpop, state);
-      % integer variable handling
+     % integer variable handling
     newpop = integerOp(opt, newpop);
-      % evaluate new pop
+     % change the evaluation flags for newly-borned individual from 1 to 0 before expensive evaluation    
+     % evaluate new pop
     [newpop, state] = evaluate(opt, newpop, state);
      
     % 2. Combine the new population and old population : combinepop = pop + newpop

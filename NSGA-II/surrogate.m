@@ -17,11 +17,22 @@ function [opt,nextpop,state,surrogatemodel,surrogateOpt,frontpop]=surrogate...
 numObj=opt.numObj;
 numCons=opt.numCons;
 % 1. make new pop: S=new(P)
+%------check expensively evaluated individuals
+%------the flag at this mooment is 1 because they are evaluated at step 4
+expensivePop=surrogateOpt.expensivePop;
+expensivePop_indi=vertcat(expensivePop.var);
+
 % 1.1. new population from operators
 newpop=selectOp(opt,pop); % Select offsprings from parents and put them in mating pool
 newpop=crossoverOp(opt,newpop,state);
 newpop=mutationOp(opt,newpop,state);
 newpop = integerOp(opt,newpop);
+%------set flags for newly-generated individuals
+for i=1:length(newpop)
+    if ~ismember(newpop(i).var,expensivePop_indi,'rows')
+        newpop(i).expensive=0;
+    end
+end
 
 % 1.2. Evaluate the approximation value of both objectives and constraints
 %    testing data
@@ -127,9 +138,16 @@ else % for single-objective optimization
      [opt,nextpop] = extract(opt, out);
     %4. Expensive evaluation of the obj and cons
      [nextpop, state] = evaluate(opt, nextpop, state);
-    %5. Teal fitness
+    %5. Real fitness
     [opt, nextpop, state] = fitnessValue(opt, nextpop, state);
 end
+for i=1:length(nextpop)
+     if ~ismember(nextpop(i).var,expensivePop_indi,'rows')
+         expensivePop=[expensivePop,nextpop(i)];
+         expensivePop_indi=[expensivePop_indi;nextpop(i).var];
+     end
+ end
+ surrogateOpt.expensivePop=expensivePop;
 
 %6. Determine whether to update the surrogate model based on model
 % preciseness.
