@@ -73,9 +73,8 @@ pop = opt.initfun{1}(opt, pop, opt.initfun{2:end});
 % expensively evaluate the individuals
 [pop, state] = evaluate(opt, pop, state);
 % save expensive evaluations
-if opt.surrogate.use==1
-    surrogateOpt.expensivePop=pop;
-end
+surrogateOpt.expensivePop=pop;
+
 % now we need rank the solutions in current generation
 % calculate the fitness value for single obejctive
 [opt, pop, state] = fitnessValue(opt, pop, state);
@@ -157,6 +156,10 @@ while( ngen < opt.maxGen)
  if (~opt.surrogate.use) % don't use surrogate    
     % Generate new population through selection, crossover, and mutation
     % operators
+%------check expensively evaluated individuals
+%------the flag at this mooment is 1 because they are evaluated at step 4
+    expensivePop=surrogateOpt.expensivePop;
+    expensivePop_indi=vertcat(expensivePop.var);    
     % 1. Create new pop
     %****************************************
      % selection operator
@@ -168,6 +171,12 @@ while( ngen < opt.maxGen)
     newpop = mutationOp(opt, newpop, state);
      % integer variable handling
     newpop = integerOp(opt, newpop);
+    %------set flags for newly-generated individuals
+    for i=1:length(newpop)
+        if ~ismember(newpop(i).var,expensivePop_indi,'rows')
+            newpop(i).expensive=0;
+        end
+    end
      % change the evaluation flags for newly-borned individual from 1 to 0 before expensive evaluation    
      % evaluate new pop
     [newpop, state] = evaluate(opt, newpop, state);
