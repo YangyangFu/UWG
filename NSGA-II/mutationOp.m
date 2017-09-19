@@ -129,7 +129,7 @@ p_real=options{1}; %10
 p_integer=options{2};%4
 
 child=parent;
-nVar=length(parent);
+nVar=length(parent.var);
 
 lb = opt.lb;
 ub = opt.ub;
