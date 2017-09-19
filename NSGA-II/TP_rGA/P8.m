@@ -4,6 +4,7 @@ function [y,cons] = P8(x)
 % Description:
 %   x1~x3: Real
 %   x4~x7: Integer, 0 or 1
+% The global solution is (0.2,1.280624,1.954483,1,0,0,1) and y=3.557463
 % Reference: 
 %   Deep, Kusum, et al. "A real coded genetic algorithm for solving integer
 %         and mixed integer optimization problems." Applied Mathematics 
