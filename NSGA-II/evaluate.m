@@ -5,11 +5,14 @@ function [pop, state] = evaluate(opt, pop, state)
 %
 %    Author: Yangyang Fu
 %    Date: 07/03/2017
+%    Revisions:
+%       2017-08-24: Add codes to avoid repeatedly evaluate the same
+%                   individual in different generations.
 %*************************************************************************
 
 N = length(pop);
 allTime = zeros(N, 1);  % allTime : use to calculate average evaluation times
-
+conf=opt.configuration;
 %*************************************************************************
 % Evaluate objective function in parallel
 %*************************************************************************
@@ -46,7 +49,7 @@ if( strcmpi(opt.useParallel, 'yes') == 1 )
     
     parfor i = 1:N
         fprintf('\nEvaluating the objective function... Generation: %d / %d , Individual: %d / %d \n', state.currentGen, opt.maxGen, i, N);
-        [pop(i), allTime(i)] = evalIndividual(pop(i), opt.objfun);
+        [pop(i), allTime(i)] = evalIndividual(pop(i), opt.objfun,i,conf);
     end
 
 %*************************************************************************
@@ -55,7 +58,7 @@ if( strcmpi(opt.useParallel, 'yes') == 1 )
 else
     for i = 1:N
         fprintf('\nEvaluating the objective function... Generation: %d / %d , Individual: %d / %d \n', state.currentGen, opt.maxGen, i, N);
-        [pop(i), allTime(i)] = evalIndividual(pop(i), opt.objfun);
+        [pop(i), allTime(i)] = evalIndividual(pop(i), opt.objfun,i,conf);
     end
 end
 
@@ -68,30 +71,64 @@ state.evaluateCount = state.evaluateCount + length(pop);
 
 
 
-function [indi, evalTime] = evalIndividual(indi, objfun)
+function [indi, evalTime] = evalIndividual(indi, objfun,index,conf)
 % Function: [indi, evalTime] = evalIndividual(indi, objfun, varargin)
 % Description: Evaluate one objective function.
 %
 %         LSSSSWC, NWPU
 %    Revision: 1.1  Data: 2011-07-25
 %*************************************************************************
-
-tStart = tic;
-[y, cons] = objfun( indi.var);
-indi.cons=cons;
-evalTime = toc(tStart);
-
-% Save the objective values and constraint violations
-indi.obj = y;
-if( ~isempty(indi.cons) )
-    idx = find( cons>0 );
-    if( ~isempty(idx) )
-        indi.nViol = length(idx);
-        indi.violSum = sum( abs(cons(idx)) );
-    else
-        indi.nViol = 0;
-        indi.violSum = 0;
+if indi.expensive==0
+    % copy files to new tempory folder to avoid conflicts in parallel computing
+    if ~isempty(conf)
+        folderName=copyFiles(index,conf);
+        
+        % change working directory to temp folder
+        cwd=pwd;
+        cd ([cwd,'/',folderName]);
     end
+    tStart = tic;
+    [y, cons] = objfun( indi.var);
+    indi.cons=cons;
+    evalTime = toc(tStart);
+    
+    % Save the objective values and constraint violations
+    indi.obj = y;
+    if( ~isempty(indi.cons) )
+        idx = find( cons>0 );
+        if( ~isempty(idx) )
+            indi.nViol = length(idx);
+            indi.violSum = sum( abs(cons(idx)) );
+        else
+            indi.nViol = 0;
+            indi.violSum = 0;
+        end
+    end
+    
+    if ~isempty(conf)
+        cd ../
+        % delete the temp folder
+        rmdir(folderName,'s');
+    end
+    % change the flag to true
+    indi.expensive=1;
+else
+    evalTime=0;
+    % the flag keep to be true although it's not evaluated in current
+    % generation
 end
+
+function folderName=copyFiles(folderIndex,conf)
+% conf: configuration files that specify the input files, a cell.
+    % create tempory folder
+    % folder name:
+    folderName=sprintf('temp-%d',folderIndex);
+    mkdir(folderName);
+    % copy specifed files
+    for i=1:length(conf)
+        copyfile(conf{i}, [folderName,'/',conf{i}]);
+    end
+    
+    
 
 

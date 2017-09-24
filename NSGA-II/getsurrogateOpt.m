@@ -15,7 +15,7 @@ surrogateOpt=struct(...
     'numVar',[],...% number of variables;
     'numObj',[],...;% number of output in surrogate model;
     ...
-    'perfFun','productmoment',...% performance function 
+    'perfFun','spearman',...% performance function 
     'performance',0,...% performance value
     'traindataAll',[],... % train data X
     'truefitnessAll',[],...% train data Y - fitness

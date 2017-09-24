@@ -16,6 +16,8 @@ resultPath = strcat(currentPath,'\output\UWGoutput.xlsx');
 outputPath = strcat(currentPath,'\SensitivityAnalysis\2016data\OutputsDec.xlsx');
 
 %% Update model inputs
+% print x for debug
+x
 t1_start=tic;
 % Update meteorological factor
 % xlswrite(interfacePath,num(i,1),1,'D4');    % A1
@@ -34,7 +36,6 @@ xlswrite(interfacePath,x(5),1,'D17');  % B3
 xlswrite(interfacePath,x(6),1,'D19');  % B5
 % xlswrite(interfacePath,num(i,13),1,'D21');  % B6
 % xlswrite(interfacePath,num(i,14),1,'D23');  % B7
-
 % Update vegetation varible
 % xlswrite(interfacePath,num(i,15),1,'D25');  % C1
 % xlswrite(interfacePath,num(i,16),1,'D26');  % C2
@@ -122,7 +123,6 @@ t2_start=tic;
 [~,TPred]=UWGGA;
 t2=toc(t2_start);
 sprintf('simulation costs %d seconds',t2)
-
 m=load('Dec1to7');
 %% Calculate and output the objective and constrants
 w_nmbe=0.75;
@@ -133,5 +133,10 @@ cons=[];
 
 %% unlock function in memory
 munlock UWGGA;
+p = System.Diagnostics.Process.GetProcessesByName('excel');
+for i=1:length(p)
+syscall=sprintf('taskkill /F /FI "pid ne %u" /IM excel.exe',p(i).Id);
+system(syscall)
+end
 
 end

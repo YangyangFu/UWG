@@ -52,7 +52,8 @@ defaultopt = struct(...
     ...% surrogate strategy parameter
     'use',0,...% Whether surrogate is used in operation,0-no;1-yes
     'miu',50,...% when use a surrogate model, lamda=2*miu is set as default,otherwise, lamda=miu;
-    'lamda',100.)...
+    'lamda',100),...
+    'configuration',[]... % configuration files path for reading input for expensive simulation
     );
 
 

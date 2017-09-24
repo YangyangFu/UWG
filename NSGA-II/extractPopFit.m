@@ -47,7 +47,11 @@ else % Surrogate model is used
 % 3. extract (1-alpha)N feasible solutions
      % sort infeasible solution based on objective values. Required by DIS
      % sorting
-     [~,ind2]=sort(vertcat(infeaspop.obj));
+     if ~isempty (infeaspop)
+         [~,ind2]=sort(vertcat(infeaspop.obj));
+     else
+         ind2=[];
+     end
      if length(feaspop)>=feasNum %top (1-alpha)*popsize feasible data are selected.
         [~,ind1]=sort(vertcat(feaspop.fitness)); 
         feasSet=feaspop(ind1(1:feasNum)); % the first feasNum minimum values       
@@ -63,6 +67,7 @@ else % Surrogate model is used
         need=infeasNum-length(infeaspop);
         infeasSet=[infeaspop,feaspop(ind1(feasNum+1:feasNum+need))];       
     end  
+
 % 5. extract next pop
     nextpop=[feasSet,infeasSet];
 end

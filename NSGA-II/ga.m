@@ -36,7 +36,8 @@ pop = repmat( struct(...
     'violSum', 0,...
     'nViolSurr',0,...
     'violSumSurr',0,...
-    'fitness',0),...
+    'fitness',0,...
+    'expensive',0),... % flag for exensive evaluation: 0-false, 1-true
     [1,popsize]);
 
 % state: optimization state of one generation
@@ -58,23 +59,22 @@ state = struct(...
 result.pops     = repmat(pop, [opt.maxGen, 1]);     % each row is the population of one generation
 result.states   = repmat(state, [opt.maxGen, 1]);   % each row is the optimizaiton state of one generation
 result.opt      = opt;                              % use for output
-
+result.surrogatemodel = cell(opt.maxGen,nObj+nCons);
 % global variables
-global STOP_NSGA;   %STOP_NSGA : used in GUI , if STOP_NSGA~=0, then stop the optimizaiton
-STOP_NSGA = 0;
 
 % plot set
-figure;
-hold on;
-axe1=subplot(2,1,1);
-axe2=subplot(2,1,2);
 
 %======================================================================
 %                   Initialization at generation=0
 %======================================================================
 ngen = 1;
 pop = opt.initfun{1}(opt, pop, opt.initfun{2:end});
+
+% expensively evaluate the individuals
 [pop, state] = evaluate(opt, pop, state);
+% save expensive evaluations
+surrogateOpt.expensivePop=pop;
+
 % now we need rank the solutions in current generation
 % calculate the fitness value for single obejctive
 [opt, pop, state] = fitnessValue(opt, pop, state);
@@ -83,20 +83,23 @@ pop = opt.initfun{1}(opt, pop, opt.initfun{2:end});
 % objective and constraints, if neccessary.
 if opt.surrogate.use
     
-    surrogatemodel=cell(opt.maxGen,nObj+nCons);
     %surrogateperf=zeros(opt.maxGen,nObj+nCons);
     for i=1:length(pop)
         surrogateOpt.traindataAll(i,:)=pop(i).var;
         surrogateOpt.truefitnessAll(i,:)=pop(i).obj;
-        surrogateOpt.trueconstraintAll(i,:)=pop(i).cons;
+        if nCons==0
+           surrogateOpt.trueconstraintAll=[];
+        else
+           surrogateOpt.trueconstraintAll(i,:)=pop(i).cons;
+        end
     end
     
     % train surrogate model for objective functions
     for j=1:nObj
         
-        [net,surrogateOpt]=trainsurrogate(surrogateOpt.traindataAll,surrogateOpt.truefitnessAll(:,j),...
+        [net.net,surrogateOpt]=trainsurrogate(surrogateOpt.traindataAll,surrogateOpt.truefitnessAll(:,j),...
             surrogateOpt,opt);
-        surrogatemodel{ngen,j}=net;
+        result.surrogatemodel{ngen,j}=net;
         %surrogateperf(ngen,j)=surrogateOpt.performance;
     end
     
@@ -106,10 +109,10 @@ if opt.surrogate.use
     consSurrogateIndex=surrogateOpt.consSurrogateIndex;
     if ~isempty(consSurrogateIndex)
         for j=1:length(consSurrogateIndex)
-            [net,surrogateOpt]=trainsurrogate(surrogateOpt.traindataAll,...
+            [net.net,surrogateOpt]=trainsurrogate(surrogateOpt.traindataAll,...
                 surrogateOpt.trueconstraintAll(:,consSurrogateIndex(j)),...
                 surrogateOpt,opt);
-            surrogatemodel{ngen,consSurrogateIndex(j)+nObj}=net;
+            result.surrogatemodel{ngen,consSurrogateIndex(j)+nObj}=net;
         end
     end
     
@@ -120,7 +123,7 @@ if opt.surrogate.use
     pop(i).violSumSurr=pop(i).violSum;
     end
     
-    surrogatemodel(ngen+1,:)=surrogatemodel(ngen,:);
+    result.surrogatemodel(ngen+1,:)=result.surrogatemodel(ngen,:);
     
 end
 % state
@@ -131,10 +134,17 @@ state = statpop(opt,pop, state);
 result.pops(1, :) = pop;
 result.states(1)  = state;
 
+% plot
+figure;
+hold on;
+axe1=subplot(2,1,1);
+axe2=subplot(2,1,2);
+plotga(result,ngen,axe1,axe2);
+
 %======================================================================
 %                   Main Loop
 %======================================================================
-while( ngen < opt.maxGen && STOP_NSGA==0)
+while( ngen < opt.maxGen)
     % 0. Display some information
     ngen = ngen+1;
     state.currentGen = ngen;
@@ -146,17 +156,29 @@ while( ngen < opt.maxGen && STOP_NSGA==0)
  if (~opt.surrogate.use) % don't use surrogate    
     % Generate new population through selection, crossover, and mutation
     % operators
+%------check expensively evaluated individuals
+%------the flag at this mooment is 1 because they are evaluated at step 4
+    expensivePop=surrogateOpt.expensivePop;
+    expensivePop_indi=vertcat(expensivePop.var);    
     % 1. Create new pop
     %****************************************
      % selection operator
     newpop = selectOp(opt, pop);
+     
      % crossover operator
-    newpop = crossoverOp(opt, newpop,state);
+    newpop = crossoverOp(opt, newpop,state);    
      % mutation operator
     newpop = mutationOp(opt, newpop, state);
-      % integer variable handling
+     % integer variable handling
     newpop = integerOp(opt, newpop);
-      % evaluate new pop
+    %------set flags for newly-generated individuals
+    for i=1:length(newpop)
+        if ~ismember(newpop(i).var,expensivePop_indi,'rows')
+            newpop(i).expensive=0;
+        end
+    end
+     % change the evaluation flags for newly-borned individual from 1 to 0 before expensive evaluation    
+     % evaluate new pop
     [newpop, state] = evaluate(opt, newpop, state);
      
     % 2. Combine the new population and old population : combinepop = pop + newpop
@@ -168,8 +190,8 @@ while( ngen < opt.maxGen && STOP_NSGA==0)
     pop = extractPopFit(opt, combinepop);
     
  else % use sorrogate 
-   [opt,pop,state,surrogatemodel,surrogateOpt]=surrogate...
-            (opt,pop,state, surrogatemodel,surrogateOpt);       
+   [opt,pop,state,result.surrogatemodel,surrogateOpt]=surrogate...
+            (opt,pop,state, result.surrogatemodel,surrogateOpt);       
  end
 % 5. Save current generation results
 state.totalTime = toc(tStart);
