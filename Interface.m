@@ -11,11 +11,11 @@ bld6Path = 'C:\Users\maoj\Dropbox\UWG_Matlab-master\data\DOERefBuildings\BLD6.xl
 bld10Path = 'C:\Users\maoj\Dropbox\UWG_Matlab-master\data\DOERefBuildings\BLD10.xlsx';
 bld14Path = 'C:\Users\maoj\Dropbox\UWG_Matlab-master\data\DOERefBuildings\BLD14.xlsx';
 resultPath = 'C:\Users\maoj\Dropbox\UWG_Matlab-master\output\UWGoutput.xlsx';
-outputPath = 'C:\Users\maoj\Dropbox\UWG_Matlab-master\SensitivityAnalysis\2016data\OutputsDec.xlsx';
+outputPath = 'C:\Users\maoj\Dropbox\UWG_Matlab-master\SensitivityAnalysis\2017data\OutputsAug.xlsx';
 
 [num, ~, ~] = xlsread(inputPath,1,'A1:AD1000');
 
-for i = 962:1000
+for i = 701:1000
     
     disp(['Run ',num2str(i)]);
     

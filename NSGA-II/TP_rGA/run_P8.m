@@ -9,7 +9,7 @@ options.numCons = 9;                    % number of constraints
 options.lb = [0,0,0,0,0,0,0];                  % lower bound of x
 options.ub = [1.2,1.8,2.5,1,1,1,1];                  % upper bound of x
 options.objfun = @P8;     % objective function handle
-options.consfun=@P8;
+options.consfun = @P8;
 options.plotInterval = 1;               % interval between two calls of "plotnsga". 
 
 %options.crossover{1,1}='intermediate';
@@ -17,7 +17,6 @@ options.plotInterval = 1;               % interval between two calls of "plotnsg
 %options.crossoverFraction=0.9;
 %options.mutation={'gaussian',0.5,0.75};
 %options.mutationFraction=1./2;
-
 
 % options.crossover{1,1}='simulatedbinary';
 % options.crossover{1,2}=20;% crossover operator distribution indices
@@ -30,7 +29,6 @@ options.crossoverFraction=0.8;
 options.mutation={'power',10,4};
 options.mutationFraction=0.005;
 
-
 options.sortingfun={'fit',0.2};
 
 options.vartype=[1,1,1,2,2,2,2];
@@ -38,15 +36,12 @@ options.useParallel='no';
 options.poolsize=20;
 options.initpop=[1,1,1,1,1,1,1];%[0.5 4;0.4 4];
 
-
-
 options.surrogate.use=1;
 miu=options.popsize;
 lamda=3*miu;
 
 options.surrogate.miu=miu;
 options.surrogate.lamda=lamda;
-
 
 surrogateOpt=getsurrogateOpt;
 

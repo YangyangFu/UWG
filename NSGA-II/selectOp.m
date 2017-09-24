@@ -43,7 +43,7 @@ for i = 1:2:(2*popsize2)
         % Real coded genetic alforithm for signle objective optimization
             result = fitnessComp(pop(p1),pop(p2));
         otherwise
-            error("No such algorithm provided. Please specify the algorithm in opt.algorithm");
+            error('No such algorithm provided. Please specify the algorithm in opt.algorithm');
     end
     
     if(result == 1)

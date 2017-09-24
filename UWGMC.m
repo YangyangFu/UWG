@@ -60,8 +60,8 @@ function [new_climate_file] = UWGMC(CL_EPW_PATH,CL_EPW,CL_XML_PATH,CL_XML,CL_RE_
         fullyScripted = 1;
     catch
         % [epwFileName,epwPathName] = uigetfile('.epw','Select Rural EnergyPlus Weather File');
-        epwFileName = 'MasdarWeather2016_EPW.epw';
-        epwPathName = 'C:\Users\maoj\Dropbox\UWG_Matlab-master\data\AbuDhabi\weather2016\';
+        epwFileName = 'MasdarWeather2017_EPW.epw';
+        epwPathName = 'C:\Users\maoj\Dropbox\UWG_Matlab-master\data\AbuDhabi\ruralWeather2017\';
         climate_data = strcat(epwPathName,epwFileName);
     end
 
