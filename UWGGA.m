@@ -751,21 +751,33 @@ function [new_climate_file,gaTPredict] = UWGGA(CL_EPW_PATH,CL_EPW,CL_XML_PATH,CL
     if strcmp('Yes',writeXLS)
             
         T_can = transpose([UCMData.canTemp])-273.15;
-        hT_can = zeros (24,1);
-        gaTPredict = zeros (24,1);
+        hT_canFeb = zeros (24,1);
+        hT_canAug = zeros (24,1);
+        gaTPredictFeb = zeros (24,1);
+        gaTPredictAug = zeros (24,1);
 
-        days = simTime.days;        % Number of days in the simulation
-        for i = 1:N
+        days = simTime.days/2;        % Number of days in the simulation
+        for i = 1:(N/2)
             hour = mod(i,24);
-            days = simTime.days;
+            days = simTime.days/2;
             if hour == 0
                 hour = 24;
             end
-            hT_can (hour) = hT_can (hour) + T_can(i)/days;
+            hT_canFeb (hour) = hT_canFeb (hour) + T_can(i)/days;
+        end
+        
+        for i = (N/2 + 1):N
+            hour = mod(i,24);
+            days = simTime.days/2;
+            if hour == 0
+                hour = 24;
+            end
+            hT_canAug (hour) = hT_canAug (hour) + T_can(i)/days;
         end
     end
     
-    gaTPredict = hT_can;
+    gaTPredictFeb = hT_canFeb;
+    gaTPredictAug = hT_canAug;
 
 end
 
