@@ -9,3 +9,6 @@ UWGv4.1/**
 AutomaticCalibration/**
 
 data/**
+
+# Files from NSGA-II optimization
+populations.txt
