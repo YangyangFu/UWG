@@ -37,8 +37,8 @@ else % Surrogate model is used
     if alpha>1
         warning ('alpha in DIS is larger than 1, which should be in [0 1].')
         alpha=min(1,alpha);
-    elseif alpha==0
-        error ('alpha in DIS must be larger than 0, which should be in [0 1].')
+%     elseif alpha==0
+%         error ('alpha in DIS must be larger than 0, which should be in [0 1].')
     end
 
     infeasNum=round(alpha*popsize);
