@@ -5,6 +5,10 @@ function [result,surrogateOpt] = ga(opt,surrogateOpt,varargin)
 %   Author: Yangyang Fu
 %   Contact: yangyang.fu@colorado.edu
 %   First Implementation: 8/03/2017
+global nExpEst;
+%Initialize the number of expensive estimation
+nExpEst=0;
+maxExpEst=500;
 
 tStart = tic();
 %*************************************************************************
@@ -144,7 +148,7 @@ plotga(result,ngen,axe1,axe2);
 %======================================================================
 %                   Main Loop
 %======================================================================
-while( ngen < opt.maxGen)
+while( ngen < opt.maxGen && nExpEst < maxExpEst)
     % 0. Display some information
     ngen = ngen+1;
     state.currentGen = ngen;
@@ -199,6 +203,7 @@ state = statpop(opt,pop, state);
 
 result.pops(ngen, :) = pop;
 result.states(ngen)  = state;
+result.nExpEst=nExpEst;
  % 6. plot current population and output
 if( mod(ngen, opt.plotInterval)==0 )
     plotga(result,ngen,axe1,axe2);
