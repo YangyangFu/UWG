@@ -1,6 +1,6 @@
 options = nsgaopt();                    % create default options structure
 options.popsize = 80;                   % populaion size
-options.maxGen  = 60;                  % max generation
+options.maxGen  = 6;                  % max generation
 
 options.numObj = 1;                     % number of objectives
 options.numVar = 7;                     % number of design variables
@@ -35,7 +35,7 @@ options.useParallel='no';
 options.poolsize=20;
 options.initpop=[];%[0.5 4;0.4 4];
 
-options.surrogate.use=1;
+options.surrogate.use=0;
 miu=options.popsize;
 lamda=3*miu;
 

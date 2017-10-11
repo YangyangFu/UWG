@@ -71,15 +71,13 @@ state.evaluateCount = state.evaluateCount + length(pop);
 
 
 
-function [indi, evalTime] = evalIndividual(indi, objfun,index,conf)
+function [indi, evalTime,state] = evalIndividual(indi, objfun,index,conf,state)
 % Function: [indi, evalTime] = evalIndividual(indi, objfun, varargin)
 % Description: Evaluate one objective function.
 %
 %         LSSSSWC, NWPU
 %    Revision: 1.1  Data: 2011-07-25
 %*************************************************************************
-global nExpEst;
-
 if indi.expensive==0
     % copy files to new tempory folder to avoid conflicts in parallel computing
     if ~isempty(conf)
@@ -114,9 +112,6 @@ if indi.expensive==0
     end
     % change the flag to true
     indi.expensive=1;
-    
-    % record the number of expensive evaluations
-    nExpEst=nExpEst + 1;
 else
     evalTime=0;
     % the flag keep to be true although it's not evaluated in current
