@@ -1,4 +1,4 @@
-function nextpop = extractPopFit( opt,pop )
+function nextpop = extractPopFit( opt,pop)
 %EXTRACTPOPFIT Extract new poppulation by comparing fitness value. Use only
 %for single-objective optimization
 %   The best several indiviudals are selected for next population
@@ -19,12 +19,27 @@ else
     popsize = opt.popsize;
 end
 
+% add etilism to avoid inaccurate approximation
+    % ratio beta, the best beta individuals will go to next population
+    % directly
+    oldpop=pop(end-popsize+1:end);
+    beta=opt.etilism;
+    etiNum=round(beta*popsize);
+    if length(oldpop)>=etiNum %top (1-alpha)*popsize feasible data are selected.
+        [~,ind1]=sort(vertcat(oldpop.fitness)); 
+        etiSet=oldpop(ind1(1:etiNum)); % the first feasNum minimum values       
+    else
+        etiSet=oldpop;      
+    end 
 
 
 if ~opt.surrogate.use %No surrogate model
     fitnessValue = vertcat(pop.fitness);
     [~,index] = sort(fitnessValue);    
     nextpop=pop(index(1:popsize));
+    if etiNum>0
+        nextpop(end-etiNum+1:end) = etiSet; 
+    end
 else % Surrogate model is used
 % extract the best f indiviudals from feasible individuals, 
 % and extract the worst (n-f) indiviudals from infeasible individuals.
@@ -67,8 +82,12 @@ else % Surrogate model is used
         need=infeasNum-length(infeaspop);
         infeasSet=[infeaspop,feaspop(ind1(feasNum+1:feasNum+need))];       
     end  
-
-% 5. extract next pop
+%5. Add etilism    
+    if etiNum>0
+        feasSet(end-etiNum+1:end) = etiSet; 
+    end
+% 6. extract next pop
+    
     nextpop=[feasSet,infeasSet];
 end
 
