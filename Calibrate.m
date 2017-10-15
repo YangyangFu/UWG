@@ -20,9 +20,9 @@ options.mutationFraction=0.01;
 
 options.sortingfun={'fit',0};
 options.vartype=[1,1,1,1,1,1,1,1,1,1,1,1];
-options.useParallel='yes';
+options.useParallel='no';
 options.poolsize=10;
-options.initpop=[80,150,0.5,35,0.5,0.25,1000,0.4,3,22,13,20];%[0.5 4;0.4 4];
+options.initpop=[52.6,153.0,0.1,37.9,0.33,0.345,964.8,0.46,3.998,20.744,13.5,23.2];%[0.5 4;0.4 4];
 
 % options for surrogate model
 options.surrogate.use=1;
@@ -47,3 +47,4 @@ surrogateOpt.consSurrogateIndex=[];
 options.configuration={'data'};
 
 [result,surrogateOpt] = ga(options,surrogateOpt);                % begin the optimization!
+save result2.mat
