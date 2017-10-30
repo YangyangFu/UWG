@@ -149,23 +149,22 @@ t1=toc(t1_start);
 sprintf('updating model input costs %d seconds',t1)
 
 %% Run simulation for winter
+w_nmbe=0.75;
+
 t2_start=tic;
 [~,TPredWinter]=UWGGAWinter;
 t2=toc(t2_start);
 sprintf('simulation for Winter costs %d seconds',t2)
 winter=load('Feb1to7');
-
+gofWinter=GOF(TPredWinter,winter.measure,w_nmbe);
 %% Run simulation for summer
 t3_start=tic;
-[~,TPredSummer]=UWGGAWinter;
+[~,TPredSummer]=UWGGASummer;
 t3=toc(t3_start);
-sprintf('simulation for Winter costs %d seconds',t3)
+sprintf('simulation for Summer costs %d seconds',t3)
 summer=load('Aug1to7');
 
 %% Calculate and output the objective and constrants
-
-w_nmbe=0.75;
-gofWinter=GOF(TPredWinter,winter.measure,w_nmbe);
 gofSummer=GOF(TPredSummer,summer.measure,w_nmbe);
 gof = (gofWinter+gofSummer)/2;
 % constraints if any
