@@ -106,6 +106,8 @@ for j=1:length(newpop)
     % save the objective values and constraints violation for ture
     % model. Mind that objetice value in both expensive eva and approximate
     % eva wille be the same in this line.
+    % Assume the surrogate can approximate the objective and constraints
+    % very well.
     newpop(j).obj=newpop(j).surrfitness;
     newpop(j).cons=newpop(j).surrcons;
     
@@ -135,6 +137,8 @@ else % for single-objective optimization
     %2. Fitness value 
      [opt, out, state] = fitnessValue(opt, combinepop, state); 
     %3. Extact Q from S: sorting function has to be "fit"
+    % This step should garantee that the best invididual should be kept in
+    % the next popoulation. This is so-called etilism.
      [opt,nextpop] = extract(opt, out);
     %4. Expensive evaluation of the obj and cons
      [nextpop, state] = evaluate(opt, nextpop, state);

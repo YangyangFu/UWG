@@ -1,4 +1,4 @@
-function [new_climate_file,gaTPredict] = UWGGA(CL_EPW_PATH,CL_EPW,CL_XML_PATH,CL_XML,CL_RE_PATH,CL_RE)
+function [new_climate_file,gaTPredict] = UWGGAWinter(CL_EPW_PATH,CL_EPW,CL_XML_PATH,CL_XML,CL_RE_PATH,CL_RE)
     % =========================================================================
     %  THE URBAN WEATHER GENERATOR
     % =========================================================================
@@ -63,8 +63,8 @@ function [new_climate_file,gaTPredict] = UWGGA(CL_EPW_PATH,CL_EPW,CL_XML_PATH,CL
         fullyScripted = 1;
     catch
         % [epwFileName,epwPathName] = uigetfile('.epw','Select Rural EnergyPlus Weather File');
-        epwFileName = 'MasdarWeather2016_EPW.epw';
-        epwPathName = strcat(currentPath,'/data/AbuDhabi/weather2016/');
+        epwFileName = 'MasdarWeather2017_EPW.epw';
+        epwPathName = strcat(currentPath,'/data/AbuDhabi/weather2017/');
         climate_data = strcat(epwPathName,epwFileName);
     end
 
@@ -137,7 +137,7 @@ function [new_climate_file,gaTPredict] = UWGGA(CL_EPW_PATH,CL_EPW,CL_XML_PATH,CL
         xml_location = strcat(CL_XML_PATH,'\',CL_XML);
     catch
         % [FileName,PathName] = uigetfile('*.xml;*.m;*.xlsm','Select Urban Parameter Input file');
-        FileName = 'RunUWG_AD_GA.xlsm';
+        FileName = 'RunUWG_AD_GA_Winter.xlsm';
         PathName = strcat(currentPath,'/data/');
         xml_location = strcat(PathName,FileName);
     end
@@ -748,36 +748,24 @@ function [new_climate_file,gaTPredict] = UWGGA(CL_EPW_PATH,CL_EPW,CL_XML_PATH,CL
         save ('UWGdata.mat','RSMData','UCMData','UBLData','WeatherData','USMData','time');
     end
     
-    if strcmp('Yes',writeXLS)
+   if strcmp('Yes',writeXLS)
             
         T_can = transpose([UCMData.canTemp])-273.15;
-        hT_canFeb = zeros (24,1);
-        hT_canAug = zeros (24,1);
-        gaTPredictFeb = zeros (24,1);
-        gaTPredictAug = zeros (24,1);
+        hT_can = zeros (24,1);
+        gaTPredict = zeros (24,1);
 
-        days = simTime.days/2;        % Number of days in the simulation
-        for i = 1:(N/2)
+        days = simTime.days;        % Number of days in the simulation
+        for i = 1:N
             hour = mod(i,24);
-            days = simTime.days/2;
+
             if hour == 0
                 hour = 24;
             end
-            hT_canFeb (hour) = hT_canFeb (hour) + T_can(i)/days;
-        end
-        
-        for i = (N/2 + 1):N
-            hour = mod(i,24);
-            days = simTime.days/2;
-            if hour == 0
-                hour = 24;
-            end
-            hT_canAug (hour) = hT_canAug (hour) + T_can(i)/days;
+            hT_can (hour) = hT_can (hour) + T_can(i)/days;
         end
     end
     
-    gaTPredictFeb = hT_canFeb;
-    gaTPredictAug = hT_canAug;
+    gaTPredict = hT_can;
 
 end
 

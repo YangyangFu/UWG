@@ -19,7 +19,7 @@ nVar    = opt.numVar;
 nObj    = opt.numObj;
 nCons   = opt.numCons;
 popsize = opt.popsize;
-
+maxExpEva = opt.maxExpEva;
 % pop : current population
 % newpop : new population created by genetic algorithm operators
 % combinepop = pop + newpop;
@@ -62,6 +62,7 @@ result.opt      = opt;                              % use for output
 result.surrogatemodel = cell(opt.maxGen,nObj+nCons);
 % global variables
 
+
 % plot set
 
 %======================================================================
@@ -72,6 +73,8 @@ pop = opt.initfun{1}(opt, pop, opt.initfun{2:end});
 
 % expensively evaluate the individuals
 [pop, state] = evaluate(opt, pop, state);
+
+numExpEva=length(pop);
 % save expensive evaluations
 surrogateOpt.expensivePop=pop;
 
@@ -133,7 +136,7 @@ state = statpop(opt,pop, state);
 
 result.pops(1, :) = pop;
 result.states(1)  = state;
-
+result.numExpEva(1) = numExpEva;
 % plot
 figure;
 hold on;
@@ -144,7 +147,8 @@ plotga(result,ngen,axe1,axe2);
 %======================================================================
 %                   Main Loop
 %======================================================================
-while( ngen < opt.maxGen)
+while( ngen < opt.maxGen && numExpEva < maxExpEva)
+
     % 0. Display some information
     ngen = ngen+1;
     state.currentGen = ngen;
@@ -171,12 +175,16 @@ while( ngen < opt.maxGen)
     newpop = mutationOp(opt, newpop, state);
      % integer variable handling
     newpop = integerOp(opt, newpop);
-    %------set flags for newly-generated individuals
+    %------set flags for newly-generated individuals and newly-generated
+    %individuals need expensive evaluations
+    j=0;
     for i=1:length(newpop)
         if ~ismember(newpop(i).var,expensivePop_indi,'rows')
             newpop(i).expensive=0;
+            j=j+1;
         end
     end
+    numExpEva=numExpEva + j;
      % change the evaluation flags for newly-borned individual from 1 to 0 before expensive evaluation    
      % evaluate new pop
     [newpop, state] = evaluate(opt, newpop, state);
@@ -191,7 +199,8 @@ while( ngen < opt.maxGen)
     
  else % use sorrogate 
    [opt,pop,state,result.surrogatemodel,surrogateOpt]=surrogate...
-            (opt,pop,state, result.surrogatemodel,surrogateOpt);       
+            (opt,pop,state, result.surrogatemodel,surrogateOpt);  
+   numExpEva =length(surrogateOpt.expensivePop);
  end
 % 5. Save current generation results
 state.totalTime = toc(tStart);
@@ -199,6 +208,7 @@ state = statpop(opt,pop, state);
 
 result.pops(ngen, :) = pop;
 result.states(ngen)  = state;
+result.numExpEva(ngen) = numExpEva;
  % 6. plot current population and output
 if( mod(ngen, opt.plotInterval)==0 )
     plotga(result,ngen,axe1,axe2);

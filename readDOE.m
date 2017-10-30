@@ -5,7 +5,7 @@ function readDOE
 % Sheet 3 = LocationSummary
 % Sheet 4 = Schedules
 % Note BLD8 & 10 = school
-% Revisions: Yangyang Fu (UC Boulder)
+% Revisions: Yangyang Fu (CU Boulder)
 %    Use function instead of script to avoid memory issue in optimization
 
 % DOE Building Types
@@ -297,8 +297,10 @@ end
 % refBEM(6,2,1).building.glazingRatio = 0.3;
 
 save ('RefDOE.mat','refDOE','refBEM','Schedule');
-%clear functions;
-clear all;
+%clear functions except for global variables
+%clear all;
+clear variables;
+clear functions;
 end
 % wall & roof definition based on material
 % Material,

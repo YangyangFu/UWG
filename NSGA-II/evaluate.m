@@ -71,7 +71,7 @@ state.evaluateCount = state.evaluateCount + length(pop);
 
 
 
-function [indi, evalTime] = evalIndividual(indi, objfun,index,conf)
+function [indi, evalTime,state] = evalIndividual(indi, objfun,index,conf,state)
 % Function: [indi, evalTime] = evalIndividual(indi, objfun, varargin)
 % Description: Evaluate one objective function.
 %

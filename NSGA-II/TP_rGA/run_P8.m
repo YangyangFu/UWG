@@ -1,7 +1,6 @@
-
 options = nsgaopt();                    % create default options structure
-options.popsize = 140;                   % populaion size
-options.maxGen  = 50;                  % max generation
+options.popsize = 120;                   % populaion size
+options.maxGen  = 60;                  % max generation
 
 options.numObj = 1;                     % number of objectives
 options.numVar = 7;                     % number of design variables
@@ -27,9 +26,9 @@ options.plotInterval = 1;               % interval between two calls of "plotnsg
 options.crossover={'laplace',0,0.15,0.35};
 options.crossoverFraction=0.8;
 options.mutation={'power',10,4};
-options.mutationFraction=0.05;
+options.mutationFraction=0.2;
 
-options.sortingfun={'fit',0.2};
+options.sortingfun={'fit',0.0};
 
 options.vartype=[1,1,1,2,2,2,2];
 options.useParallel='no';
