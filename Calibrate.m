@@ -18,12 +18,11 @@ options.mutation={'power',10,4};
 options.mutationFraction=0.2;
 
 
-options.sortingfun={'fit',0};
+options.sortingfun={'fit',0.05};
 options.vartype=[1,1,1,1,1,1,1,1,1,1,1,1];
 options.useParallel='no';
 options.poolsize=10;
-options.initpop=[];%[0.5 4;0.4 4];
-%[86.8,149.8,0.1,39,0.28,0.32,1130,0.1,3.5,23,14,24]
+options.initpop=[];
 % options for surrogate model
 options.surrogate.use=1;
 miu=options.popsize;
@@ -36,7 +35,7 @@ surrogateOpt=getsurrogateOpt;
 nhidden=round(miu/3);
 surrogateOpt.numVar=options.numVar;
 surrogateOpt.numObj=options.numObj; 
-surrogateOpt.model{1,1}='svm';
+surrogateOpt.model{1,1}='bpann';
 surrogateOpt.model{1,2}='gs';
 surrogateOpt.model{1,3}=nhidden;
 
@@ -47,4 +46,4 @@ surrogateOpt.consSurrogateIndex=[];
 %options.configuration={'data'};
 options.configuration=[];
 [result,surrogateOpt] = ga(options,surrogateOpt);                % begin the optimization!
-save result3.mat
+save result5.mat
