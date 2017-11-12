@@ -35,7 +35,7 @@ surrogateOpt=getsurrogateOpt;
 nhidden=round(miu/3);
 surrogateOpt.numVar=options.numVar;
 surrogateOpt.numObj=options.numObj; 
-surrogateOpt.model{1,1}='bpann';
+surrogateOpt.model{1,1}='svm';
 surrogateOpt.model{1,2}='gs';
 surrogateOpt.model{1,3}=nhidden;
 
