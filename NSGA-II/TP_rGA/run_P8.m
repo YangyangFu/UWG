@@ -28,7 +28,7 @@ options.crossoverFraction=0.8;
 options.mutation={'power',10,4};
 options.mutationFraction=0.2;
 
-options.sortingfun={'fit',0.0};
+options.sortingfun={'fit',0.05};
 
 options.vartype=[1,1,1,2,2,2,2];
 options.useParallel='no';
@@ -47,11 +47,12 @@ surrogateOpt=getsurrogateOpt;
 nhidden=round(miu/3);
 surrogateOpt.numVar=options.numVar;
 surrogateOpt.numObj=options.numObj;
-surrogateOpt.model{1,1}='svm';
+surrogateOpt.model{1,1}='bpann';
 surrogateOpt.model{1,2}='gs';
 surrogateOpt.model{1,3}=nhidden;
 surrogateOpt.model{1,5}='euclidean';
 surrogateOpt.model{1,6}='kmedoids';
+surrogateOpt.perfFun='productmoment';
 % % rbf
 % surrogateOpt.numVar=options.numVar;
 % surrogateOpt.numObj=options.numObj;
