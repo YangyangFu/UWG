@@ -35,7 +35,7 @@ options.useParallel='no';
 options.poolsize=20;
 options.initpop=[];%[0.5 4;0.4 4];
 
-options.surrogate.use=1;
+options.surrogate.use=0;
 miu=options.popsize;
 lamda=3*miu;
 
