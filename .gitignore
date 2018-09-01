@@ -12,4 +12,7 @@ AutomaticCalibration/**
 ###Files from NSGA-II optimization
 populations.txt
 
+## matfile
+*.mat
+
 
