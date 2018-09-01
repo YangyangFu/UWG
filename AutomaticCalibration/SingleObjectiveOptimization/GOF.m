@@ -1,4 +1,4 @@
-function [objVal]=GOF(s,m,w_nmbe)
+function [objVal]=GOF(s,m,Trural,w_nmbe)
 %input
 % x: design variables,
 %output
@@ -6,8 +6,9 @@ function [objVal]=GOF(s,m,w_nmbe)
 n=length(s);
 
 w_cv=1-w_nmbe;
-nmbe = sum(s-m)/(mean(m)*n);
-cv_rmse=sqrt(sum((s-m).^2)/n)/mean(m);
+m_bar = mean(abs(Trural-m));
+nmbe = sum(s-m)/(m_bar*n);
+cv_rmse=sqrt(sum((s-m).^2)/(n-1))/m_bar;
 
 objVal=sqrt(((w_nmbe*nmbe)^2+(w_cv*cv_rmse)^2)/(w_nmbe^2+w_cv^2));
 

@@ -15,7 +15,7 @@ options.plotInterval = 1;               % interval between two calls of "plotnsg
 options.crossover={'laplace',0,0.15,0.35};
 options.crossoverFraction=0.8;
 options.mutation={'power',10,4};
-options.mutationFraction=0.2;
+options.mutationFraction=0.01;
 
 
 options.sortingfun={'fit',0.05};
@@ -46,4 +46,6 @@ surrogateOpt.consSurrogateIndex=[];
 %options.configuration={'data'};
 options.configuration=[];
 [result,surrogateOpt] = ga(options,surrogateOpt);                % begin the optimization!
+
 save result1_nosurrogate.mat
+

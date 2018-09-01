@@ -114,12 +114,12 @@ xlswrite(bld4Path,x(12),2,'L6');    % D10
 % xlswrite(bld6Path,num(i,22),3,'E38');   % D2
 % xlswrite(bld6Path,num(i,23),3,'E8');    % D3
 % xlswrite(bld6Path,num(i,24),3,'E9');    % D4
-xlswrite(bld4Path,x(8),2,'U3');    % D5
-xlswrite(bld4Path,x(9),3,'E12');   % D6
-xlswrite(bld4Path,x(10),4,'G11');   % D7
-xlswrite(bld4Path,x(11),2,'N3');    % D8
-% xlswrite(bld4Path,num(i,29),2,'M3');    % D9
-xlswrite(bld4Path,x(12),2,'L6');    % D10
+xlswrite(bld6Path,x(8),2,'U3');    % D5
+xlswrite(bld6Path,x(9),3,'E12');   % D6
+xlswrite(bld6Path,x(10),4,'G11');   % D7
+xlswrite(bld6Path,x(11),2,'N3');    % D8
+% xlswrite(bld6Path,num(i,29),2,'M3');    % D9
+xlswrite(bld6Path,x(12),2,'L6');    % D10
 
 %% Update building system BLD10
 % xlswrite(bld10Path,num(i,21),1,'D5');    % D1
@@ -152,20 +152,20 @@ sprintf('updating model input costs %d seconds',t1)
 w_nmbe=0.75;
 
 t2_start=tic;
-[~,TPredWinter]=UWGGAWinter;
+[~,TUrbanPredWinter,TRuralPredWinter]=UWGGAUrbanRuralWinter;
 t2=toc(t2_start);
 sprintf('simulation for Winter costs %d seconds',t2)
 winter=load('Feb1to7');
-gofWinter=GOF(TPredWinter,winter.measure,w_nmbe);
+gofWinter=GOF(TUrbanPredWinter,winter.measure,TRuralPredWinter,w_nmbe);
 %% Run simulation for summer
 t3_start=tic;
-[~,TPredSummer]=UWGGASummer;
+[~,TUrbanPredSummer,TRuralPredSummer]=UWGGAUrbanRuralSummer;
 t3=toc(t3_start);
 sprintf('simulation for Summer costs %d seconds',t3)
 summer=load('Aug1to7');
 
 %% Calculate and output the objective and constrants
-gofSummer=GOF(TPredSummer,summer.measure,w_nmbe);
+gofSummer=GOF(TUrbanPredSummer,summer.measure,TRuralPredSummer,w_nmbe);
 gof = (gofWinter+gofSummer)/2;
 % constraints if any
 cons=[];
