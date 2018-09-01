@@ -24,7 +24,7 @@ options.useParallel='no';
 options.poolsize=10;
 options.initpop=[];
 % options for surrogate model
-options.surrogate.use=1;
+options.surrogate.use=0;
 miu=options.popsize;
 lamda=3*miu;
 
@@ -46,4 +46,4 @@ surrogateOpt.consSurrogateIndex=[];
 %options.configuration={'data'};
 options.configuration=[];
 [result,surrogateOpt] = ga(options,surrogateOpt);                % begin the optimization!
-save result5.mat
+save result1_nosurrogate.mat
